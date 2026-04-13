@@ -1,0 +1,177 @@
+"""SQLAlchemy models for ProTerra CRM."""
+import uuid
+from datetime import date, datetime
+from sqlalchemy import (
+    Column, String, Text, Float, Boolean, Integer, Date, DateTime,
+    ForeignKey, Enum as SAEnum
+)
+from sqlalchemy.orm import relationship
+from .database import Base
+
+
+def gen_id(prefix: str = "") -> str:
+    return f"{prefix}{uuid.uuid4().hex[:12]}"
+
+
+# ── Leads ──────────────────────────────────────────────────────────────
+class Lead(Base):
+    __tablename__ = "leads"
+
+    lead_id = Column(String, primary_key=True, default=lambda: gen_id("lead_"))
+    full_name = Column(String, nullable=False)
+    email = Column(String, default="")
+    phone = Column(String, default="")
+    property_address = Column(String, default="")
+    city = Column(String, default="")
+    state = Column(String, default="")
+    zip_code = Column(String, default="")
+    project_type = Column(String, default="")  # Pool, Outdoor Kitchen, Patio, Full Backyard, Other
+    budget_range = Column(String, default="")
+    timeline = Column(String, default="")
+    source = Column(String, default="website")  # website, facebook, instagram, referral, phone
+    status = Column(String, default="New Lead")  # New Lead, Contacted, Analysis Scheduled, Analysis Complete, Proposal Sent, Signed, Lost
+    notes = Column(Text, default="")
+    created_at = Column(DateTime, default=datetime.utcnow)
+    updated_at = Column(DateTime, default=datetime.utcnow, onupdate=datetime.utcnow)
+
+    # Relationship to project (once converted)
+    project = relationship("Project", back_populates="lead", uselist=False)
+
+
+# ── Projects ───────────────────────────────────────────────────────────
+class Project(Base):
+    __tablename__ = "projects"
+
+    project_id = Column(String, primary_key=True, default=lambda: gen_id("proj_"))
+    lead_id = Column(String, ForeignKey("leads.lead_id"), nullable=True)
+    client_name = Column(String, nullable=False)
+    client_email = Column(String, default="")
+    client_phone = Column(String, default="")
+    property_address = Column(String, default="")
+    project_type = Column(String, default="")
+    description = Column(Text, default="")
+    status = Column(String, default="Survey Scheduled")
+    # Statuses: Survey Scheduled, Survey Complete, Design In Progress, Client Review,
+    #           Revisions, Design Approved, Bidding Phase, Builder Selected, Construction, Complete
+    budget_estimate = Column(Float, default=0.0)
+    actual_cost = Column(Float, default=0.0)
+    start_date = Column(Date, nullable=True)
+    target_completion = Column(Date, nullable=True)
+    notes = Column(Text, default="")
+    created_at = Column(DateTime, default=datetime.utcnow)
+    updated_at = Column(DateTime, default=datetime.utcnow, onupdate=datetime.utcnow)
+
+    lead = relationship("Lead", back_populates="project")
+    tasks = relationship("Task", back_populates="project", cascade="all, delete-orphan")
+    bid_packages = relationship("BidPackage", back_populates="project", cascade="all, delete-orphan")
+    files = relationship("ProjectFile", back_populates="project", cascade="all, delete-orphan")
+
+
+# ── Tasks ──────────────────────────────────────────────────────────────
+class Task(Base):
+    __tablename__ = "tasks"
+
+    task_id = Column(String, primary_key=True, default=lambda: gen_id("task_"))
+    project_id = Column(String, ForeignKey("projects.project_id"), nullable=False)
+    title = Column(String, nullable=False)
+    description = Column(Text, default="")
+    status = Column(String, default="pending")  # pending, in_progress, completed
+    priority = Column(String, default="medium")  # low, medium, high
+    due_date = Column(Date, nullable=True)
+    completed_at = Column(DateTime, nullable=True)
+    sort_order = Column(Integer, default=0)
+    created_at = Column(DateTime, default=datetime.utcnow)
+
+    project = relationship("Project", back_populates="tasks")
+
+
+# ── Project Files ──────────────────────────────────────────────────────
+class ProjectFile(Base):
+    __tablename__ = "project_files"
+
+    file_id = Column(String, primary_key=True, default=lambda: gen_id("file_"))
+    project_id = Column(String, ForeignKey("projects.project_id"), nullable=False)
+    filename = Column(String, nullable=False)
+    file_type = Column(String, default="")  # drone_photo, 3d_render, design_pdf, survey, other
+    file_url = Column(String, default="")  # In MVP, store base64 or local path
+    file_size = Column(Integer, default=0)
+    uploaded_at = Column(DateTime, default=datetime.utcnow)
+
+    project = relationship("Project", back_populates="files")
+
+
+# ── Contractors ────────────────────────────────────────────────────────
+class Contractor(Base):
+    __tablename__ = "contractors"
+
+    contractor_id = Column(String, primary_key=True, default=lambda: gen_id("con_"))
+    company_name = Column(String, nullable=False)
+    contact_name = Column(String, default="")
+    email = Column(String, default="")
+    phone = Column(String, default="")
+    specialty = Column(String, default="")  # Pool Builder, Hardscape, Landscaping, Electrical, Plumbing, General
+    service_area = Column(String, default="")
+    license_number = Column(String, default="")
+    insurance_status = Column(String, default="Active")  # Active, Expired, Unknown
+    insurance_expiry = Column(Date, nullable=True)
+    rating = Column(Float, default=0.0)  # Internal rating 0-5
+    notes = Column(Text, default="")
+    active = Column(Boolean, default=True)
+    created_at = Column(DateTime, default=datetime.utcnow)
+    updated_at = Column(DateTime, default=datetime.utcnow, onupdate=datetime.utcnow)
+
+    bids = relationship("Bid", back_populates="contractor")
+
+
+# ── Bid Packages ───────────────────────────────────────────────────────
+class BidPackage(Base):
+    __tablename__ = "bid_packages"
+
+    package_id = Column(String, primary_key=True, default=lambda: gen_id("bp_"))
+    project_id = Column(String, ForeignKey("projects.project_id"), nullable=False)
+    title = Column(String, nullable=False)
+    scope_of_work = Column(Text, default="")
+    material_specs = Column(Text, default="")
+    site_conditions = Column(Text, default="")
+    timeline_requirements = Column(String, default="")
+    deadline = Column(Date, nullable=True)
+    status = Column(String, default="Draft")  # Draft, Open, Closed, Awarded
+    created_at = Column(DateTime, default=datetime.utcnow)
+
+    project = relationship("Project", back_populates="bid_packages")
+    bids = relationship("Bid", back_populates="bid_package", cascade="all, delete-orphan")
+
+
+# ── Bids ───────────────────────────────────────────────────────────────
+class Bid(Base):
+    __tablename__ = "bids"
+
+    bid_id = Column(String, primary_key=True, default=lambda: gen_id("bid_"))
+    package_id = Column(String, ForeignKey("bid_packages.package_id"), nullable=False)
+    contractor_id = Column(String, ForeignKey("contractors.contractor_id"), nullable=False)
+    total_price = Column(Float, default=0.0)
+    materials_cost = Column(Float, default=0.0)
+    labor_cost = Column(Float, default=0.0)
+    equipment_cost = Column(Float, default=0.0)
+    permit_cost = Column(Float, default=0.0)
+    proposed_timeline = Column(String, default="")
+    warranty_terms = Column(String, default="")
+    notes = Column(Text, default="")
+    status = Column(String, default="Invited")  # Invited, Viewed, Submitted, Under Review, Awarded, Declined
+    submitted_at = Column(DateTime, nullable=True)
+    created_at = Column(DateTime, default=datetime.utcnow)
+
+    bid_package = relationship("BidPackage", back_populates="bids")
+    contractor = relationship("Contractor", back_populates="bids")
+
+
+# ── Activity Log ───────────────────────────────────────────────────────
+class ActivityLog(Base):
+    __tablename__ = "activity_log"
+
+    log_id = Column(String, primary_key=True, default=lambda: gen_id("log_"))
+    entity_type = Column(String, nullable=False)  # lead, project, contractor, bid
+    entity_id = Column(String, nullable=False)
+    action = Column(String, nullable=False)  # created, updated, status_changed, etc.
+    details = Column(Text, default="")
+    created_at = Column(DateTime, default=datetime.utcnow)
