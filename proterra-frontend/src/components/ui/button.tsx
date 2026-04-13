@@ -9,7 +9,7 @@ export interface ButtonProps extends React.ButtonHTMLAttributes<HTMLButtonElemen
 const Button = React.forwardRef<HTMLButtonElement, ButtonProps>(
   ({ className, variant = "default", size = "default", ...props }, ref) => {
     const variants: Record<string, string> = {
-      default: "bg-zinc-900 text-zinc-50 hover:bg-zinc-800",
+      default: "bg-slate-800 text-white hover:bg-slate-700",
       destructive: "bg-red-500 text-zinc-50 hover:bg-red-600",
       outline: "border border-zinc-300 bg-white hover:bg-zinc-100",
       secondary: "bg-zinc-100 text-zinc-900 hover:bg-zinc-200",
