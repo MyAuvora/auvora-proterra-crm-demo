@@ -4,13 +4,19 @@
 
 @layer base {
   :root {
-    --radius: 0.5rem;
+    --radius: 0.625rem;
   }
   * {
     @apply border-stone-200;
   }
   body {
-    @apply bg-stone-50 text-slate-900;
+    @apply bg-stone-100 text-slate-900 antialiased;
+  }
+}
+
+@layer utilities {
+  .text-balance {
+    text-wrap: balance;
   }
 }
 

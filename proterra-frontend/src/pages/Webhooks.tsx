@@ -65,8 +65,8 @@ export default function Webhooks() {
   return (
     <div className="space-y-6">
       <div>
-        <h1 className="text-3xl font-bold">Lead Form Webhooks</h1>
-        <p className="text-zinc-500 mt-1">
+        <h1 className="text-3xl font-bold text-slate-900">Lead Form Webhooks</h1>
+        <p className="text-slate-500 mt-1">
           Connect your website and social media to automatically capture leads
         </p>
       </div>
@@ -74,10 +74,10 @@ export default function Webhooks() {
       {/* Webhook Endpoints */}
       <div className="grid grid-cols-1 gap-4 lg:grid-cols-3">
         {webhookEndpoints.map((wh) => (
-          <Card key={wh.title}>
+          <Card key={wh.title} className="border-0 shadow-sm hover:shadow-lg transition-all duration-300">
             <CardHeader>
               <div className="flex items-center gap-3">
-                <div className={`flex h-10 w-10 items-center justify-center rounded-lg ${wh.color} text-white`}>
+                <div className={`flex h-10 w-10 items-center justify-center rounded-xl ${wh.color} text-white shadow-md`}>
                   <wh.icon className="h-5 w-5" />
                 </div>
                 <div>
@@ -90,7 +90,7 @@ export default function Webhooks() {
               <div className="space-y-2">
                 <div className="flex items-center gap-2">
                   <Badge variant="outline">{wh.method}</Badge>
-                  <code className="flex-1 text-xs bg-zinc-100 p-2 rounded truncate">{wh.endpoint}</code>
+                  <code className="flex-1 text-xs bg-stone-100 p-2 rounded-lg truncate font-mono">{wh.endpoint}</code>
                   <Button
                     size="icon"
                     variant="ghost"
@@ -111,16 +111,16 @@ export default function Webhooks() {
       </div>
 
       {/* Integration Guide */}
-      <Card>
-        <CardHeader>
+      <Card className="border-0 shadow-md">
+        <CardHeader className="border-b border-stone-100 bg-stone-50/50">
           <div className="flex items-center gap-2">
-            <Code className="h-5 w-5" />
+            <Code className="h-5 w-5 text-sky-600" />
             <CardTitle className="text-lg">Website Integration</CardTitle>
           </div>
           <CardDescription>Add this form to your website to capture leads automatically</CardDescription>
         </CardHeader>
-        <CardContent>
-          <pre className="bg-zinc-900 text-zinc-100 p-4 rounded-lg text-sm overflow-x-auto">
+        <CardContent className="pt-6">
+          <pre className="bg-gradient-to-br from-slate-900 to-slate-800 text-slate-100 p-4 rounded-xl text-sm overflow-x-auto shadow-inner">
 {`<!-- ProTerra Design Lead Capture Form -->
 <form id="lead-form">
   <input name="full_name" placeholder="Full Name" required />
@@ -154,8 +154,8 @@ document.getElementById('lead-form').addEventListener('submit', async (e) => {
       </Card>
 
       {/* Test Form */}
-      <Card>
-        <CardHeader>
+      <Card className="border-0 shadow-md">
+        <CardHeader className="border-b border-stone-100 bg-stone-50/50">
           <CardTitle className="text-lg">Test Lead Submission</CardTitle>
           <CardDescription>Send a test lead to verify your webhook is working</CardDescription>
         </CardHeader>

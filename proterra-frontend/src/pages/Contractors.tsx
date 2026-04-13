@@ -81,7 +81,7 @@ export default function Contractors() {
   if (loading)
     return (
       <div className="flex items-center justify-center h-64">
-        <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-sky-600" />
+        <div className="animate-spin rounded-full h-10 w-10 border-2 border-sky-200 border-t-sky-600" />
       </div>
     );
 
@@ -89,8 +89,8 @@ export default function Contractors() {
     <div className="space-y-6">
       <div className="flex items-center justify-between">
         <div>
-          <h1 className="text-3xl font-bold">Contractor Database</h1>
-          <p className="text-zinc-500 mt-1">{contractors.length} contractors</p>
+          <h1 className="text-3xl font-bold text-slate-900">Contractor Database</h1>
+          <p className="text-slate-500 mt-1">{contractors.length} contractors</p>
         </div>
         <Button onClick={() => setDialogOpen(true)}>
           <Plus className="mr-2 h-4 w-4" /> Add Contractor
@@ -108,12 +108,12 @@ export default function Contractors() {
       {/* Contractor Cards */}
       <div className="grid grid-cols-1 gap-4 md:grid-cols-2 xl:grid-cols-3">
         {contractors.map((c) => (
-          <Card key={c.contractor_id} className="hover:shadow-md transition-shadow">
+          <Card key={c.contractor_id} className="border-0 shadow-sm hover:shadow-lg transition-all duration-300 hover:-translate-y-0.5">
             <CardHeader className="pb-3">
               <div className="flex items-start justify-between">
                 <div>
                   <CardTitle className="text-base">{c.company_name}</CardTitle>
-                  <p className="text-sm text-zinc-500">{c.contact_name}</p>
+                  <p className="text-sm text-slate-500">{c.contact_name}</p>
                 </div>
                 <Badge variant={c.status === "Active" ? "default" : "secondary"}>
                   {c.status}
@@ -122,22 +122,22 @@ export default function Contractors() {
             </CardHeader>
             <CardContent className="space-y-2">
               <div className="flex items-center gap-2 text-sm">
-                <HardHat className="h-3.5 w-3.5 text-zinc-400" />
+                <HardHat className="h-3.5 w-3.5 text-slate-400" />
                 <span>{c.specialty}</span>
               </div>
               {c.email && (
-                <div className="flex items-center gap-2 text-sm text-zinc-600">
-                  <Mail className="h-3.5 w-3.5" /> {c.email}
+                <div className="flex items-center gap-2 text-sm text-slate-600">
+                  <Mail className="h-3.5 w-3.5 text-slate-400" /> {c.email}
                 </div>
               )}
               {c.phone && (
-                <div className="flex items-center gap-2 text-sm text-zinc-600">
-                  <Phone className="h-3.5 w-3.5" /> {c.phone}
+                <div className="flex items-center gap-2 text-sm text-slate-600">
+                  <Phone className="h-3.5 w-3.5 text-slate-400" /> {c.phone}
                 </div>
               )}
               {c.license_number && (
-                <div className="flex items-center gap-2 text-sm text-zinc-600">
-                  <Award className="h-3.5 w-3.5" /> License: {c.license_number}
+                <div className="flex items-center gap-2 text-sm text-slate-600">
+                  <Award className="h-3.5 w-3.5 text-slate-400" /> License: {c.license_number}
                 </div>
               )}
 
@@ -149,11 +149,11 @@ export default function Contractors() {
                     className={`h-4 w-4 ${star <= c.rating ? "fill-amber-400 text-amber-400" : "text-zinc-200"}`}
                   />
                 ))}
-                <span className="text-xs text-zinc-400 ml-1">({c.rating}/5)</span>
+                <span className="text-xs text-slate-400 ml-1">({c.rating}/5)</span>
               </div>
 
               {/* Bid Stats */}
-              <div className="flex items-center gap-4 text-xs text-zinc-500 pt-2 border-t">
+              <div className="flex items-center gap-4 text-xs text-slate-500 pt-2 border-t border-stone-100">
                 <span>Bids: {c.total_bids}</span>
                 <span>Won: {c.won_bids}</span>
                 <span>Win Rate: {(c.win_rate * 100).toFixed(0)}%</span>
@@ -179,9 +179,12 @@ export default function Contractors() {
       </div>
 
       {contractors.length === 0 && (
-        <div className="text-center py-12 text-zinc-400">
-          <HardHat className="h-12 w-12 mx-auto mb-4 opacity-50" />
-          <p>No contractors yet. Add your first contractor!</p>
+        <div className="text-center py-16 text-slate-400">
+          <div className="mx-auto mb-4 flex h-16 w-16 items-center justify-center rounded-2xl bg-slate-100">
+            <HardHat className="h-8 w-8 text-slate-400" />
+          </div>
+          <p className="text-lg font-medium text-slate-500">No contractors yet</p>
+          <p className="text-sm mt-1">Add your first contractor!</p>
         </div>
       )}
 
