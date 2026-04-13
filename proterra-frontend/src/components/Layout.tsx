@@ -40,19 +40,16 @@ export default function Layout() {
           sidebarOpen ? "translate-x-0" : "-translate-x-full"
         }`}
       >
-        {/* Logo Area - bigger logo */}
-        <div className="flex items-center gap-3 border-b border-slate-700/50 px-5 py-5">
-          <div className="flex h-14 w-14 items-center justify-center rounded-xl bg-white/10 p-1.5 ring-1 ring-white/20">
+        {/* Logo Area */}
+        <div className="border-b border-slate-700/50 px-4 py-5">
+          <div className="rounded-xl bg-white p-3">
             <img
               src="/proterra-logo.png"
               alt="ProTerra Design"
-              className="h-full w-full rounded-lg object-contain"
+              className="h-12 w-full object-contain"
             />
           </div>
-          <div>
-            <h1 className="text-lg font-bold leading-tight tracking-wide">PROTERRA</h1>
-            <p className="text-xs font-medium text-sky-400">Outdoor Design CRM</p>
-          </div>
+          <p className="mt-2 text-center text-xs font-medium text-sky-400">Outdoor Design CRM</p>
         </div>
 
         {/* Navigation */}
