@@ -7,10 +7,10 @@
     --radius: 0.5rem;
   }
   * {
-    @apply border-zinc-200;
+    @apply border-stone-200;
   }
   body {
-    @apply bg-zinc-50 text-zinc-900;
+    @apply bg-stone-50 text-slate-900;
   }
 }
 

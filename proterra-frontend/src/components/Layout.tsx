@@ -25,7 +25,7 @@ export default function Layout() {
   const [sidebarOpen, setSidebarOpen] = useState(false);
 
   return (
-    <div className="flex h-screen overflow-hidden bg-zinc-50">
+    <div className="flex h-screen overflow-hidden bg-stone-50">
       {/* Mobile overlay */}
       {sidebarOpen && (
         <div
@@ -36,17 +36,19 @@ export default function Layout() {
 
       {/* Sidebar */}
       <aside
-        className={`fixed inset-y-0 left-0 z-40 w-64 transform bg-zinc-900 text-white transition-transform lg:relative lg:translate-x-0 ${
+        className={`fixed inset-y-0 left-0 z-40 w-64 transform bg-slate-900 text-white transition-transform lg:relative lg:translate-x-0 ${
           sidebarOpen ? "translate-x-0" : "-translate-x-full"
         }`}
       >
-        <div className="flex h-16 items-center gap-3 border-b border-zinc-700 px-6">
-          <div className="flex h-8 w-8 items-center justify-center rounded-lg bg-emerald-500 font-bold text-white text-sm">
-            PT
-          </div>
+        <div className="flex h-16 items-center gap-3 border-b border-slate-700 px-4">
+          <img
+            src="/proterra-logo.png"
+            alt="ProTerra Design"
+            className="h-10 w-10 rounded-lg object-contain"
+          />
           <div>
-            <h1 className="text-lg font-bold leading-tight">Auvora CRM</h1>
-            <p className="text-xs text-zinc-400">ProTerra Design</p>
+            <h1 className="text-base font-bold leading-tight tracking-wide">PROTERRA</h1>
+            <p className="text-xs text-slate-400">Outdoor Design CRM</p>
           </div>
         </div>
 
@@ -59,8 +61,8 @@ export default function Layout() {
               className={({ isActive }) =>
                 `flex items-center gap-3 rounded-lg px-3 py-2.5 text-sm font-medium transition-colors ${
                   isActive
-                    ? "bg-emerald-600 text-white"
-                    : "text-zinc-300 hover:bg-zinc-800 hover:text-white"
+                    ? "bg-sky-600 text-white"
+                    : "text-slate-300 hover:bg-slate-800 hover:text-white"
                 }`
               }
               end={item.to === "/"}
@@ -78,8 +80,8 @@ export default function Layout() {
             className={({ isActive }) =>
               `flex items-center gap-3 rounded-lg px-3 py-2.5 text-sm font-medium transition-colors ${
                 isActive
-                  ? "bg-emerald-600 text-white"
-                  : "bg-zinc-800 text-zinc-300 hover:bg-zinc-700 hover:text-white"
+                  ? "bg-sky-600 text-white"
+                  : "bg-slate-800 text-slate-300 hover:bg-slate-700 hover:text-white"
               }`
             }
           >
@@ -91,7 +93,7 @@ export default function Layout() {
 
       {/* Main content */}
       <div className="flex flex-1 flex-col overflow-hidden">
-        <header className="flex h-16 items-center gap-4 border-b bg-white px-6">
+        <header className="flex h-16 items-center gap-4 border-b border-stone-200 bg-white px-6">
           <button
             className="lg:hidden"
             onClick={() => setSidebarOpen(true)}
@@ -99,7 +101,7 @@ export default function Layout() {
             {sidebarOpen ? <X className="h-6 w-6" /> : <Menu className="h-6 w-6" />}
           </button>
           <div className="flex-1" />
-          <div className="text-sm text-zinc-500">
+          <div className="text-sm text-stone-500">
             ProTerra Design &mdash; Florida & Alabama Gulf Coast
           </div>
         </header>

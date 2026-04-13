@@ -51,7 +51,7 @@ export default function Dashboard() {
   if (loading)
     return (
       <div className="flex items-center justify-center h-64">
-        <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-emerald-600" />
+        <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-sky-600" />
       </div>
     );
 
@@ -59,7 +59,7 @@ export default function Dashboard() {
 
   const stats = [
     { label: "Total Leads", value: data.leads.total, icon: Users, color: "bg-blue-500" },
-    { label: "New Leads (30d)", value: data.leads.new_30d, icon: TrendingUp, color: "bg-emerald-500" },
+    { label: "New Leads (30d)", value: data.leads.new_30d, icon: TrendingUp, color: "bg-sky-500" },
     { label: "Active Projects", value: data.projects.active, icon: FolderKanban, color: "bg-purple-500" },
     { label: "Pipeline Value", value: `$${(data.projects.total_pipeline_value || 0).toLocaleString()}`, icon: DollarSign, color: "bg-amber-500" },
     { label: "Contractors", value: data.contractors.total_active, icon: HardHat, color: "bg-orange-500" },
@@ -108,7 +108,7 @@ export default function Dashboard() {
                   <div key={status} className="flex items-center justify-between">
                     <span className="text-sm">{status}</span>
                     <div className="flex items-center gap-2">
-                      <div className="h-2 rounded-full bg-emerald-500" style={{ width: `${Math.max(20, (count / data.leads.total) * 200)}px` }} />
+                      <div className="h-2 rounded-full bg-sky-500" style={{ width: `${Math.max(20, (count / data.leads.total) * 200)}px` }} />
                       <span className="text-sm font-medium w-8 text-right">{count}</span>
                     </div>
                   </div>

@@ -37,7 +37,7 @@ const statusColors: Record<string, string> = {
   Contacted: "bg-yellow-100 text-yellow-700",
   "Site Visit Scheduled": "bg-purple-100 text-purple-700",
   "Proposal Sent": "bg-orange-100 text-orange-700",
-  Qualified: "bg-emerald-100 text-emerald-700",
+  Qualified: "bg-sky-100 text-sky-700",
   Converted: "bg-green-100 text-green-700",
   Lost: "bg-red-100 text-red-700",
 };
@@ -93,7 +93,7 @@ export default function Leads() {
   if (loading)
     return (
       <div className="flex items-center justify-center h-64">
-        <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-emerald-600" />
+        <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-sky-600" />
       </div>
     );
 

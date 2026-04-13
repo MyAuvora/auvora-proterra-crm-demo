@@ -53,7 +53,7 @@ const statusColors: Record<string, string> = {
   "Client Review": "bg-yellow-100 text-yellow-700",
   "Bidding Phase": "bg-orange-100 text-orange-700",
   "Contractor Selection": "bg-amber-100 text-amber-700",
-  "Under Construction": "bg-emerald-100 text-emerald-700",
+  "Under Construction": "bg-sky-100 text-sky-700",
   "Final Inspection": "bg-purple-100 text-purple-700",
   Completed: "bg-green-100 text-green-700",
 };
@@ -126,7 +126,7 @@ export default function Projects() {
   if (loading)
     return (
       <div className="flex items-center justify-center h-64">
-        <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-emerald-600" />
+        <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-sky-600" />
       </div>
     );
 
@@ -211,7 +211,7 @@ export default function Projects() {
                     {projectTasks.length > 0 && (
                       <div className="w-full bg-zinc-100 rounded-full h-2 mb-3">
                         <div
-                          className="bg-emerald-500 h-2 rounded-full transition-all"
+                          className="bg-sky-500 h-2 rounded-full transition-all"
                           style={{ width: `${(completedTasks / projectTasks.length) * 100}%` }}
                         />
                       </div>
@@ -224,7 +224,7 @@ export default function Projects() {
                           className="flex items-center gap-2 w-full text-left text-sm hover:bg-zinc-50 rounded p-1"
                         >
                           {task.status === "completed" ? (
-                            <CheckCircle2 className="h-4 w-4 text-emerald-500 flex-shrink-0" />
+                            <CheckCircle2 className="h-4 w-4 text-sky-500 flex-shrink-0" />
                           ) : (
                             <Circle className="h-4 w-4 text-zinc-300 flex-shrink-0" />
                           )}
