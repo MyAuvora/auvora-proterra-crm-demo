@@ -3,6 +3,7 @@ from fastapi.middleware.cors import CORSMiddleware
 
 from .database import engine, Base
 from .routes import leads, projects, contractors, bidding, ai_assistant, dashboard, webhooks
+from .seed_demo_data import seed_demo_data
 
 # Create tables
 Base.metadata.create_all(bind=engine)
@@ -26,6 +27,12 @@ app.include_router(bidding.router)
 app.include_router(ai_assistant.router)
 app.include_router(dashboard.router)
 app.include_router(webhooks.router)
+
+
+@app.on_event("startup")
+def startup():
+    """Seed demo data on first startup if database is empty."""
+    seed_demo_data()
 
 
 @app.get("/healthz")
