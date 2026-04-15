@@ -1,4 +1,6 @@
-from fastapi import FastAPI, Depends
+import os
+
+from fastapi import FastAPI, Depends, Header, HTTPException
 from fastapi.middleware.cors import CORSMiddleware
 from sqlalchemy.orm import Session
 
@@ -6,6 +8,8 @@ from .database import engine, Base, get_db
 from .routes import leads, projects, contractors, bidding, ai_assistant, dashboard, webhooks
 from .seed_demo_data import seed_demo_data
 from . import models
+
+ADMIN_SECRET = os.environ.get("ADMIN_SECRET", "")
 
 # Create tables
 Base.metadata.create_all(bind=engine)
@@ -43,8 +47,13 @@ async def healthz():
 
 
 @app.post("/api/admin/reseed")
-def reseed_database(db: Session = Depends(get_db)):
-    """Reset and reseed the database with demo data. For admin use only."""
+def reseed_database(
+    db: Session = Depends(get_db),
+    x_admin_secret: str = Header(default=""),
+):
+    """Reset and reseed the database with demo data. Requires ADMIN_SECRET header."""
+    if not ADMIN_SECRET or x_admin_secret != ADMIN_SECRET:
+        raise HTTPException(status_code=403, detail="Forbidden")
     # Delete all data in reverse dependency order
     db.query(models.ActivityLog).delete()
     db.query(models.Bid).delete()
