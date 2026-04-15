@@ -1,6 +1,5 @@
 """Seed realistic demo data for ProTerra Design CRM."""
 from datetime import datetime, date, timedelta
-import random
 from .database import SessionLocal
 from . import models
 
