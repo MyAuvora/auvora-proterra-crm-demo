@@ -20,7 +20,6 @@ import {
   Bot,
   Send,
   Loader2,
-  Lightbulb,
   Activity,
   ChevronDown,
   ChevronUp,
