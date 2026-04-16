@@ -90,6 +90,24 @@ export const askAI = (question: string, context?: string) =>
   });
 export const getAISuggestions = () => request("/api/ai/suggestions");
 
+// Automations
+export const getAutomations = () => request("/api/automations");
+export const getAutomation = (id: string) => request(`/api/automations/${id}`);
+export const createAutomation = (data: Record<string, unknown>) =>
+  request("/api/automations", { method: "POST", body: JSON.stringify(data) });
+export const updateAutomation = (id: string, data: Record<string, unknown>) =>
+  request(`/api/automations/${id}`, { method: "PUT", body: JSON.stringify(data) });
+export const deleteAutomation = (id: string) =>
+  request(`/api/automations/${id}`, { method: "DELETE" });
+export const toggleAutomation = (id: string) =>
+  request(`/api/automations/${id}/toggle`, { method: "POST" });
+export const getAutomationLogs = (id: string) =>
+  request(`/api/automations/${id}/logs`);
+export const aiCreateAutomation = (prompt: string) =>
+  request("/api/automations/ai/create", { method: "POST", body: JSON.stringify({ prompt }) });
+export const getAutomationSuggestions = () =>
+  request("/api/automations/ai/suggestions");
+
 // Webhooks (for testing)
 export const submitLeadForm = (data: Record<string, unknown>) =>
   request("/api/webhooks/lead", { method: "POST", body: JSON.stringify(data) });

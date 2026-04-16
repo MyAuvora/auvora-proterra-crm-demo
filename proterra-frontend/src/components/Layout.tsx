@@ -11,6 +11,7 @@ import {
   X,
   Globe,
   Sparkles,
+  Zap,
 } from "lucide-react";
 
 const nav = [
@@ -20,6 +21,7 @@ const nav = [
   { to: "/contractors", icon: HardHat, label: "Contractors" },
   { to: "/bidding", icon: Gavel, label: "Bidding" },
   { to: "/webhooks", icon: Globe, label: "Lead Forms" },
+  { to: "/automations", icon: Zap, label: "Automations" },
 ];
 
 export default function Layout() {

@@ -175,3 +175,41 @@ class ActivityLog(Base):
     action = Column(String, nullable=False)  # created, updated, status_changed, etc.
     details = Column(Text, default="")
     created_at = Column(DateTime, default=datetime.utcnow)
+
+
+# ── Automations ───────────────────────────────────────────────────────
+class Automation(Base):
+    __tablename__ = "automations"
+
+    automation_id = Column(String, primary_key=True, default=lambda: gen_id("auto_"))
+    name = Column(String, nullable=False)
+    description = Column(Text, default="")
+    trigger_type = Column(String, nullable=False)
+    # Triggers: lead_created, lead_status_changed, project_status_changed,
+    #           bid_submitted, bid_awarded, bid_package_created, webhook_received
+    trigger_config = Column(Text, default="{}")  # JSON: e.g. {"from_status": "New Lead", "to_status": "Contacted"}
+    conditions = Column(Text, default="[]")  # JSON array of conditions
+    actions = Column(Text, default="[]")  # JSON array of actions
+    enabled = Column(Boolean, default=True)
+    run_count = Column(Integer, default=0)
+    last_run_at = Column(DateTime, nullable=True)
+    created_at = Column(DateTime, default=datetime.utcnow)
+    updated_at = Column(DateTime, default=datetime.utcnow, onupdate=datetime.utcnow)
+
+    logs = relationship("AutomationLog", back_populates="automation", cascade="all, delete-orphan")
+
+
+class AutomationLog(Base):
+    __tablename__ = "automation_logs"
+
+    log_id = Column(String, primary_key=True, default=lambda: gen_id("alog_"))
+    automation_id = Column(String, ForeignKey("automations.automation_id"), nullable=False)
+    trigger_event = Column(String, default="")
+    entity_type = Column(String, default="")
+    entity_id = Column(String, default="")
+    actions_taken = Column(Text, default="[]")  # JSON
+    success = Column(Boolean, default=True)
+    error_message = Column(Text, default="")
+    executed_at = Column(DateTime, default=datetime.utcnow)
+
+    automation = relationship("Automation", back_populates="logs")

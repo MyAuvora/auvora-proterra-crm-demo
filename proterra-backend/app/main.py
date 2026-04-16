@@ -5,7 +5,7 @@ from fastapi.middleware.cors import CORSMiddleware
 from sqlalchemy.orm import Session
 
 from .database import engine, Base, get_db
-from .routes import leads, projects, contractors, bidding, ai_assistant, dashboard, webhooks
+from .routes import leads, projects, contractors, bidding, ai_assistant, dashboard, webhooks, automations
 from .seed_demo_data import seed_demo_data
 from . import models
 
@@ -33,6 +33,7 @@ app.include_router(bidding.router)
 app.include_router(ai_assistant.router)
 app.include_router(dashboard.router)
 app.include_router(webhooks.router)
+app.include_router(automations.router)
 
 
 @app.on_event("startup")
