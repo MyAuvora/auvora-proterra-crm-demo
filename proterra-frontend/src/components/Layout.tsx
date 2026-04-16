@@ -12,6 +12,9 @@ import {
   Globe,
   Sparkles,
   Zap,
+  Shield,
+  Receipt,
+  BarChart3,
 } from "lucide-react";
 
 const nav = [
@@ -22,6 +25,9 @@ const nav = [
   { to: "/bidding", icon: Gavel, label: "Bidding" },
   { to: "/webhooks", icon: Globe, label: "Lead Forms" },
   { to: "/automations", icon: Zap, label: "Automations" },
+  { to: "/client-portal", icon: Shield, label: "Client Portal" },
+  { to: "/invoicing", icon: Receipt, label: "Invoicing" },
+  { to: "/reports", icon: BarChart3, label: "Reports" },
 ];
 
 export default function Layout() {
