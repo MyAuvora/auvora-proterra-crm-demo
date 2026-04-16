@@ -1,4 +1,5 @@
 import { useEffect, useState } from "react";
+import { useNavigate } from "react-router-dom";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { getDashboard } from "@/lib/api";
 import { Users, FolderKanban, HardHat, DollarSign, TrendingUp, Gavel, Activity, BarChart3 } from "lucide-react";
@@ -47,6 +48,7 @@ const statGradients = [
 ];
 
 export default function Dashboard() {
+  const navigate = useNavigate();
   const [data, setData] = useState<DashboardData | null>(null);
   const [loading, setLoading] = useState(true);
 
@@ -67,12 +69,12 @@ export default function Dashboard() {
   if (!data) return <p className="text-red-500">Failed to load dashboard</p>;
 
   const stats = [
-    { label: "Total Leads", value: data.leads.total, icon: Users },
-    { label: "New Leads (30d)", value: data.leads.new_30d, icon: TrendingUp },
-    { label: "Active Projects", value: data.projects.active, icon: FolderKanban },
-    { label: "Pipeline Value", value: `$${(data.projects.total_pipeline_value || 0).toLocaleString()}`, icon: DollarSign },
-    { label: "Contractors", value: data.contractors.total_active, icon: HardHat },
-    { label: "Open Bid Packages", value: data.bidding.open_packages, icon: Gavel },
+    { label: "Total Leads", value: data.leads.total, icon: Users, path: "/leads" },
+    { label: "New Leads (30d)", value: data.leads.new_30d, icon: TrendingUp, path: "/leads" },
+    { label: "Active Projects", value: data.projects.active, icon: FolderKanban, path: "/projects" },
+    { label: "Pipeline Value", value: `$${(data.projects.total_pipeline_value || 0).toLocaleString()}`, icon: DollarSign, path: "/projects" },
+    { label: "Contractors", value: data.contractors.total_active, icon: HardHat, path: "/contractors" },
+    { label: "Open Bid Packages", value: data.bidding.open_packages, icon: Gavel, path: "/bidding" },
   ];
 
   const barColors = ["bg-sky-500", "bg-blue-500", "bg-violet-500", "bg-amber-500", "bg-teal-500", "bg-rose-500", "bg-cyan-500"];
@@ -93,7 +95,11 @@ export default function Dashboard() {
       {/* Stat Cards with gradients */}
       <div className="grid grid-cols-1 gap-4 sm:grid-cols-2 lg:grid-cols-3">
         {stats.map((s, i) => (
-          <Card key={s.label} className="group overflow-hidden border-0 shadow-md hover:shadow-xl transition-all duration-300">
+          <Card
+            key={s.label}
+            className="group overflow-hidden border-0 shadow-md hover:shadow-xl transition-all duration-300 cursor-pointer"
+            onClick={() => navigate(s.path)}
+          >
             <CardContent className="p-0">
               <div className="flex items-center gap-4 p-5">
                 <div className={`flex h-14 w-14 items-center justify-center rounded-xl bg-gradient-to-br ${statGradients[i]} text-white shadow-lg`}>
