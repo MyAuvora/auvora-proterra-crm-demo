@@ -1,7 +1,6 @@
 """Document upload/download/delete endpoints for ProTerra CRM."""
 import os
 import re
-import shutil
 import uuid
 from datetime import datetime
 from fastapi import APIRouter, Depends, UploadFile, File, Form, HTTPException, Query
@@ -38,7 +37,7 @@ def _safe_file_path(entity_type: str, entity_id: str, filename: str) -> str:
     """Build a file path and verify it stays within UPLOAD_DIR."""
     path = os.path.join(UPLOAD_DIR, entity_type, entity_id, filename)
     real = os.path.realpath(path)
-    if not real.startswith(os.path.realpath(UPLOAD_DIR)):
+    if not real.startswith(os.path.realpath(UPLOAD_DIR) + os.sep):
         raise HTTPException(status_code=400, detail="Invalid file path")
     return real
 
