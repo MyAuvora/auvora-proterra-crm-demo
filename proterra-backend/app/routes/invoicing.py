@@ -80,6 +80,11 @@ def _serialize_invoice(inv: models.Invoice, db: Session) -> dict:
         "project_id": inv.project_id,
         "project_name": proj.client_name if proj else "",
         "project_type": proj.project_type if proj else "",
+        "project": {
+            "project_id": proj.project_id,
+            "project_name": proj.client_name,
+            "client_name": proj.client_name,
+        } if proj else None,
         "title": inv.title,
         "description": inv.description,
         "amount": inv.amount,
@@ -331,6 +336,10 @@ def list_schedules(
             "schedule_id": s.schedule_id,
             "project_id": s.project_id,
             "project_name": proj.client_name if proj else "",
+            "project": {
+                "project_id": proj.project_id,
+                "project_name": proj.client_name,
+            } if proj else None,
             "milestone": s.milestone,
             "percentage": s.percentage,
             "amount": s.amount,
@@ -420,5 +429,5 @@ def invoicing_summary(db: Session = Depends(get_db)):
         "total_outstanding": round(total_invoiced - total_paid, 2),
         "invoice_count": len(invoices),
         "by_status": by_status,
-        "overdue_count": overdue_count,
+        "total_overdue": overdue_count,
     }

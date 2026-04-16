@@ -124,9 +124,9 @@ export default function Reports() {
       .then(([p, c, s, pr, m]) => {
         setPipeline(p);
         setConversion(c);
-        setScorecards(s);
+        setScorecards(s.contractors || []);
         setProfit(pr);
-        setMonthly(m);
+        setMonthly(m.months || []);
       })
       .catch(console.error)
       .finally(() => setLoading(false));

@@ -38,8 +38,12 @@ def list_portal_access(db: Session = Depends(get_db)):
     items = db.query(models.ClientPortalAccess).order_by(
         models.ClientPortalAccess.created_at.desc()
     ).all()
-    return [
-        {
+    results = []
+    for a in items:
+        proj = db.query(models.Project).filter(
+            models.Project.project_id == a.project_id
+        ).first()
+        results.append({
             "access_id": a.access_id,
             "project_id": a.project_id,
             "access_token": a.access_token,
@@ -48,9 +52,13 @@ def list_portal_access(db: Session = Depends(get_db)):
             "is_active": a.is_active,
             "last_accessed_at": a.last_accessed_at,
             "created_at": a.created_at,
-        }
-        for a in items
-    ]
+            "project": {
+                "project_id": proj.project_id,
+                "project_name": proj.client_name,
+                "status": proj.status,
+            } if proj else None,
+        })
+    return results
 
 
 @router.post("/access")
@@ -120,8 +128,12 @@ def list_approvals(
     )
     if project_id:
         q = q.filter(models.DesignApproval.project_id == project_id)
-    return [
-        {
+    results = []
+    for a in q.all():
+        proj = db.query(models.Project).filter(
+            models.Project.project_id == a.project_id
+        ).first()
+        results.append({
             "approval_id": a.approval_id,
             "project_id": a.project_id,
             "title": a.title,
@@ -130,9 +142,12 @@ def list_approvals(
             "client_notes": a.client_notes,
             "created_at": a.created_at,
             "responded_at": a.responded_at,
-        }
-        for a in q.all()
-    ]
+            "project": {
+                "project_id": proj.project_id,
+                "project_name": proj.client_name,
+            } if proj else None,
+        })
+    return results
 
 
 @router.post("/approvals")

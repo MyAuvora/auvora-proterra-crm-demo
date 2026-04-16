@@ -253,8 +253,13 @@ export default function Invoicing() {
 
   const handleCreateSchedule = async () => {
     await createPaymentSchedule({
-      ...scheduleForm,
-      due_date: scheduleForm.due_date || null,
+      project_id: scheduleForm.project_id,
+      milestones: [{
+        milestone: scheduleForm.milestone,
+        percentage: scheduleForm.percentage,
+        amount: scheduleForm.amount,
+        due_date: scheduleForm.due_date || null,
+      }],
     });
     setScheduleDialogOpen(false);
     setScheduleForm({
