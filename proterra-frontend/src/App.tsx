@@ -13,6 +13,9 @@ import Automations from "./pages/Automations";
 import ClientPortal from "./pages/ClientPortal";
 import Invoicing from "./pages/Invoicing";
 import Reports from "./pages/Reports";
+import LeadDetail from "./pages/LeadDetail";
+import ProjectDetail from "./pages/ProjectDetail";
+import ContractorDetail from "./pages/ContractorDetail";
 
 function App() {
   return (
@@ -34,6 +37,9 @@ function App() {
             <Route path="/client-portal" element={<ClientPortal />} />
             <Route path="/invoicing" element={<Invoicing />} />
             <Route path="/reports" element={<Reports />} />
+            <Route path="/leads/:id" element={<LeadDetail />} />
+            <Route path="/projects/:id" element={<ProjectDetail />} />
+            <Route path="/contractors/:id" element={<ContractorDetail />} />
           </Route>
         </Routes>
       </SignedIn>

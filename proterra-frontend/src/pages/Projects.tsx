@@ -1,4 +1,5 @@
 import { useEffect, useState } from "react";
+import { useNavigate } from "react-router-dom";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
@@ -59,6 +60,7 @@ const statusColors: Record<string, string> = {
 };
 
 export default function Projects() {
+  const navigate = useNavigate();
   const [projects, setProjects] = useState<Project[]>([]);
   const [loading, setLoading] = useState(true);
   const [dialogOpen, setDialogOpen] = useState(false);
@@ -158,12 +160,12 @@ export default function Projects() {
           const isExpanded = expandedProject === project.project_id;
 
           return (
-            <Card key={project.project_id} className="border-0 shadow-sm hover:shadow-lg transition-all duration-300">
+            <Card key={project.project_id} className="border-0 shadow-sm hover:shadow-lg transition-all duration-300 cursor-pointer" onClick={() => navigate(`/projects/${project.project_id}`)}>
               <CardHeader className="pb-3">
                 <div className="flex items-start justify-between">
                   <div className="flex-1">
                     <div className="flex items-center gap-3">
-                      <CardTitle className="text-lg">{project.project_name}</CardTitle>
+                      <CardTitle className="text-lg">{project.project_name || project.client_name}</CardTitle>
                       <Badge className={statusColors[project.status] || "bg-zinc-100 text-zinc-700"}>
                         {project.status}
                       </Badge>
@@ -172,7 +174,7 @@ export default function Projects() {
                       {project.client_name} &bull; {project.project_type}
                     </p>
                   </div>
-                  <Button variant="ghost" size="icon" onClick={() => toggleExpand(project.project_id)}>
+                  <Button variant="ghost" size="icon" onClick={(e) => { e.stopPropagation(); toggleExpand(project.project_id); }}>
                     {isExpanded ? <ChevronUp className="h-4 w-4" /> : <ChevronDown className="h-4 w-4" />}
                   </Button>
                 </div>
@@ -216,7 +218,7 @@ export default function Projects() {
                         />
                       </div>
                     )}
-                    <div className="space-y-2">
+                    <div className="space-y-2" onClick={(e) => e.stopPropagation()}>
                       {projectTasks.map((task) => (
                         <button
                           key={task.task_id}
@@ -238,7 +240,7 @@ export default function Projects() {
                 )}
 
                 {/* Actions */}
-                <div className="flex items-center gap-2 mt-4 pt-3 border-t">
+                <div className="flex items-center gap-2 mt-4 pt-3 border-t" onClick={(e) => e.stopPropagation()}>
                   <Select
                     value={project.status}
                     onChange={(e) => handleStatusChange(project.project_id, e.target.value)}
