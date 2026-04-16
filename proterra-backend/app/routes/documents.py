@@ -1,5 +1,7 @@
 """Document upload/download/delete endpoints for ProTerra CRM."""
 import os
+import re
+import shutil
 import uuid
 from datetime import datetime
 from fastapi import APIRouter, Depends, UploadFile, File, Form, HTTPException, Query
@@ -21,6 +23,24 @@ ALLOWED_CATEGORIES = [
 ]
 
 MAX_FILE_SIZE = 50 * 1024 * 1024  # 50 MB
+
+# Only allow safe characters in entity IDs to prevent path traversal
+SAFE_ID_PATTERN = re.compile(r"^[a-zA-Z0-9_\-]+$")
+
+
+def _validate_entity_id(entity_id: str) -> None:
+    """Reject entity_id values that could cause path traversal."""
+    if not SAFE_ID_PATTERN.match(entity_id):
+        raise HTTPException(status_code=400, detail="Invalid entity_id")
+
+
+def _safe_file_path(entity_type: str, entity_id: str, filename: str) -> str:
+    """Build a file path and verify it stays within UPLOAD_DIR."""
+    path = os.path.join(UPLOAD_DIR, entity_type, entity_id, filename)
+    real = os.path.realpath(path)
+    if not real.startswith(os.path.realpath(UPLOAD_DIR)):
+        raise HTTPException(status_code=400, detail="Invalid file path")
+    return real
 
 
 @router.get("")
@@ -67,6 +87,7 @@ async def upload_document(
     """Upload a document and attach it to an entity."""
     if entity_type not in ("lead", "project", "contractor"):
         raise HTTPException(status_code=400, detail="entity_type must be lead, project, or contractor")
+    _validate_entity_id(entity_id)
     if category not in ALLOWED_CATEGORIES:
         category = "other"
 
@@ -79,10 +100,9 @@ async def upload_document(
     ext = os.path.splitext(file.filename or "file")[1]
     unique_name = f"{uuid.uuid4().hex[:16]}{ext}"
 
-    # Save to disk
-    entity_dir = os.path.join(UPLOAD_DIR, entity_type, entity_id)
-    os.makedirs(entity_dir, exist_ok=True)
-    file_path = os.path.join(entity_dir, unique_name)
+    # Save to disk (path-safe)
+    file_path = _safe_file_path(entity_type, entity_id, unique_name)
+    os.makedirs(os.path.dirname(file_path), exist_ok=True)
     with open(file_path, "wb") as f:
         f.write(content)
 
@@ -122,7 +142,7 @@ def download_document(document_id: str, db: Session = Depends(get_db)):
     if not doc:
         raise HTTPException(status_code=404, detail="Document not found")
 
-    file_path = os.path.join(UPLOAD_DIR, doc.entity_type, doc.entity_id, doc.filename)
+    file_path = _safe_file_path(doc.entity_type, doc.entity_id, doc.filename)
     if not os.path.exists(file_path):
         raise HTTPException(status_code=404, detail="File not found on disk")
 
@@ -141,7 +161,7 @@ def delete_document(document_id: str, db: Session = Depends(get_db)):
         raise HTTPException(status_code=404, detail="Document not found")
 
     # Remove file from disk
-    file_path = os.path.join(UPLOAD_DIR, doc.entity_type, doc.entity_id, doc.filename)
+    file_path = _safe_file_path(doc.entity_type, doc.entity_id, doc.filename)
     if os.path.exists(file_path):
         os.remove(file_path)
 
