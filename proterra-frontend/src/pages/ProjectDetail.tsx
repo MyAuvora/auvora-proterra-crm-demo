@@ -169,7 +169,7 @@ export default function ProjectDetail() {
             </Button>
           ) : (
             <>
-              <Button variant="outline" onClick={() => { setEditing(false); }}>
+              <Button variant="outline" onClick={() => { setEditing(false); if (project) { setForm({ client_name: project.client_name, client_email: project.client_email, client_phone: project.client_phone, property_address: project.property_address, project_type: project.project_type, description: project.description, budget_estimate: project.budget_estimate || project.estimated_value || 0, target_completion: project.target_completion || '', notes: project.notes || '' }); } }}>
                 Cancel
               </Button>
               <Button onClick={handleSave} disabled={saving}>

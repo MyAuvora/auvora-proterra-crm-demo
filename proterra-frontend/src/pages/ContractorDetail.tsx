@@ -131,7 +131,7 @@ export default function ContractorDetail() {
             </Button>
           ) : (
             <>
-              <Button variant="outline" onClick={() => setEditing(false)}>
+              <Button variant="outline" onClick={() => { setEditing(false); if (contractor) { setForm({ company_name: contractor.company_name, contact_name: contractor.contact_name, email: contractor.email, phone: contractor.phone, specialty: contractor.specialty, license_number: contractor.license_number, insurance_expiry: contractor.insurance_expiry, rating: contractor.rating, notes: contractor.notes || '' }); } }}>
                 Cancel
               </Button>
               <Button onClick={handleSave} disabled={saving}>

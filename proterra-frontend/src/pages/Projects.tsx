@@ -218,7 +218,7 @@ export default function Projects() {
                         />
                       </div>
                     )}
-                    <div className="space-y-2">
+                    <div className="space-y-2" onClick={(e) => e.stopPropagation()}>
                       {projectTasks.map((task) => (
                         <button
                           key={task.task_id}
