@@ -111,3 +111,40 @@ export const getAutomationSuggestions = () =>
 // Webhooks (for testing)
 export const submitLeadForm = (data: Record<string, unknown>) =>
   request("/api/webhooks/lead", { method: "POST", body: JSON.stringify(data) });
+
+// Client Portal
+export const getPortalAccess = () => request("/api/client-portal/access");
+export const createPortalAccess = (data: Record<string, unknown>) =>
+  request("/api/client-portal/access", { method: "POST", body: JSON.stringify(data) });
+export const deletePortalAccess = (id: string) =>
+  request(`/api/client-portal/access/${id}`, { method: "DELETE" });
+export const togglePortalAccess = (id: string) =>
+  request(`/api/client-portal/access/${id}/toggle`, { method: "POST" });
+export const getDesignApprovals = () => request("/api/client-portal/approvals");
+export const createDesignApproval = (data: Record<string, unknown>) =>
+  request("/api/client-portal/approvals", { method: "POST", body: JSON.stringify(data) });
+
+// Invoicing & Payments
+export const getInvoices = (status?: string) =>
+  request(`/api/invoicing/invoices${status ? `?status=${status}` : ""}`);
+export const getInvoice = (id: string) => request(`/api/invoicing/invoices/${id}`);
+export const createInvoice = (data: Record<string, unknown>) =>
+  request("/api/invoicing/invoices", { method: "POST", body: JSON.stringify(data) });
+export const updateInvoice = (id: string, data: Record<string, unknown>) =>
+  request(`/api/invoicing/invoices/${id}`, { method: "PUT", body: JSON.stringify(data) });
+export const deleteInvoice = (id: string) =>
+  request(`/api/invoicing/invoices/${id}`, { method: "DELETE" });
+export const recordPayment = (data: Record<string, unknown>) =>
+  request("/api/invoicing/payments", { method: "POST", body: JSON.stringify(data) });
+export const getPaymentSchedules = (projectId?: string) =>
+  request(`/api/invoicing/schedules${projectId ? `?project_id=${projectId}` : ""}`);
+export const createPaymentSchedule = (data: Record<string, unknown>) =>
+  request("/api/invoicing/schedules", { method: "POST", body: JSON.stringify(data) });
+export const getInvoiceSummary = () => request("/api/invoicing/summary");
+
+// Reports
+export const getRevenuePipeline = () => request("/api/reports/revenue-pipeline");
+export const getLeadConversion = () => request("/api/reports/lead-conversion");
+export const getContractorScorecards = () => request("/api/reports/contractor-scorecards");
+export const getProfitTracking = () => request("/api/reports/profit-tracking");
+export const getMonthlySummary = () => request("/api/reports/monthly-summary");

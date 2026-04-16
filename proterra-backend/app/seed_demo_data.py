@@ -853,10 +853,254 @@ def seed_demo_data():
         for ad in automations_data:
             db.add(models.Automation(**ad))
 
+        # ── Client Portal Access ────────────────────────────────────
+        import secrets as sec_mod
+        portal_access_data = [
+            {
+                "access_id": "cpa_001",
+                "project_id": "proj_001",
+                "access_token": sec_mod.token_urlsafe(32),
+                "client_name": "Mark & Lisa Henderson",
+                "client_email": "henderson.mark@gmail.com",
+                "is_active": True,
+                "last_accessed_at": now - timedelta(days=2),
+                "created_at": now - timedelta(days=30),
+            },
+            {
+                "access_id": "cpa_002",
+                "project_id": "proj_003",
+                "access_token": sec_mod.token_urlsafe(32),
+                "client_name": "Angela & Robert Foster",
+                "client_email": "angela.foster@gmail.com",
+                "is_active": True,
+                "last_accessed_at": now - timedelta(days=1),
+                "created_at": now - timedelta(days=45),
+            },
+            {
+                "access_id": "cpa_003",
+                "project_id": "proj_002",
+                "access_token": sec_mod.token_urlsafe(32),
+                "client_name": "David Chen",
+                "client_email": "david.chen@outlook.com",
+                "is_active": True,
+                "last_accessed_at": None,
+                "created_at": now - timedelta(days=20),
+            },
+            {
+                "access_id": "cpa_004",
+                "project_id": "proj_005",
+                "access_token": sec_mod.token_urlsafe(32),
+                "client_name": "The Wilson Family",
+                "client_email": "wilsonfamily@gmail.com",
+                "is_active": False,
+                "last_accessed_at": now - timedelta(days=60),
+                "created_at": now - timedelta(days=120),
+            },
+        ]
+        for pa in portal_access_data:
+            db.add(models.ClientPortalAccess(**pa))
+
+        # ── Design Approvals ────────────────────────────────────────
+        design_approvals_data = [
+            {
+                "approval_id": "appr_001",
+                "project_id": "proj_001",
+                "title": "Pool Layout & Shape - Rev 1",
+                "description": "Freeform pool with integrated spa, sun shelf on west side, LED color lighting package. Pool dimensions: 32ft x 18ft.",
+                "status": "Approved",
+                "client_notes": "Love the design! The sun shelf placement is perfect.",
+                "created_at": now - timedelta(days=25),
+                "responded_at": now - timedelta(days=23),
+            },
+            {
+                "approval_id": "appr_002",
+                "project_id": "proj_001",
+                "title": "Outdoor Kitchen Design - Rev 2",
+                "description": "Updated kitchen layout with Big Green Egg station moved to the left, added bar seating for 4, granite countertops in Venetian Gold.",
+                "status": "Approved",
+                "client_notes": "Much better layout. Approve!",
+                "created_at": now - timedelta(days=18),
+                "responded_at": now - timedelta(days=16),
+            },
+            {
+                "approval_id": "appr_003",
+                "project_id": "proj_002",
+                "title": "Infinity Pool Design - Option A",
+                "description": "Infinity edge facing bay view, rectangular shape 40ft x 16ft, integrated spa with waterfall spillover.",
+                "status": "Revision Requested",
+                "client_notes": "Can we explore a slightly wider pool? Also want to see Option B with curved edge.",
+                "created_at": now - timedelta(days=10),
+                "responded_at": now - timedelta(days=8),
+            },
+            {
+                "approval_id": "appr_004",
+                "project_id": "proj_003",
+                "title": "Pergola Color & Material",
+                "description": "Motorized louvered pergola in bronze finish, 16ft x 12ft, with integrated LED strip lighting and ceiling fan.",
+                "status": "Pending",
+                "client_notes": "",
+                "created_at": now - timedelta(days=5),
+                "responded_at": None,
+            },
+            {
+                "approval_id": "appr_005",
+                "project_id": "proj_003",
+                "title": "Landscape Lighting Plan",
+                "description": "28-fixture lighting plan: path lights along walkways, uplights on oak trees, underwater pool lights, and accent lighting on outdoor kitchen.",
+                "status": "Approved",
+                "client_notes": "Beautiful plan. Go ahead!",
+                "created_at": now - timedelta(days=15),
+                "responded_at": now - timedelta(days=13),
+            },
+        ]
+        for da in design_approvals_data:
+            db.add(models.DesignApproval(**da))
+
+        # ── Invoices & Line Items ───────────────────────────────────
+        invoices_data = [
+            {
+                "invoice_id": "inv_001",
+                "project_id": "proj_003",
+                "invoice_number": "INV-2026-001",
+                "title": "Foster Estate - Deposit",
+                "description": "30% deposit for pool and outdoor living construction",
+                "amount": 79500.0,
+                "tax_rate": 7.5,
+                "tax_amount": 5962.50,
+                "total": 85462.50,
+                "status": "Paid",
+                "due_date": date(2026, 1, 15),
+                "paid_at": now - timedelta(days=55),
+                "notes": "Deposit received. Construction started.",
+                "created_at": now - timedelta(days=60),
+            },
+            {
+                "invoice_id": "inv_002",
+                "project_id": "proj_003",
+                "invoice_number": "INV-2026-002",
+                "title": "Foster Estate - Midpoint",
+                "description": "40% midpoint payment - pool shell complete, kitchen framing done",
+                "amount": 106000.0,
+                "tax_rate": 7.5,
+                "tax_amount": 7950.0,
+                "total": 113950.0,
+                "status": "Sent",
+                "due_date": date(2026, 4, 30),
+                "paid_at": None,
+                "notes": "Due upon pool shell and outdoor kitchen framing completion.",
+                "created_at": now - timedelta(days=10),
+            },
+            {
+                "invoice_id": "inv_003",
+                "project_id": "proj_005",
+                "invoice_number": "INV-2025-010",
+                "title": "Wilson Pool - Final Payment",
+                "description": "Final 30% payment upon project completion and inspection",
+                "amount": 27600.0,
+                "tax_rate": 7.5,
+                "tax_amount": 2070.0,
+                "total": 29670.0,
+                "status": "Paid",
+                "due_date": date(2026, 2, 15),
+                "paid_at": now - timedelta(days=65),
+                "notes": "Project completed. Final payment received.",
+                "created_at": now - timedelta(days=70),
+            },
+            {
+                "invoice_id": "inv_004",
+                "project_id": "proj_006",
+                "invoice_number": "INV-2026-003",
+                "title": "Dr. Patel - Outdoor Kitchen Final",
+                "description": "Final payment for outdoor kitchen completion",
+                "amount": 21360.0,
+                "tax_rate": 7.5,
+                "tax_amount": 1602.0,
+                "total": 22962.0,
+                "status": "Overdue",
+                "due_date": date(2026, 4, 1),
+                "paid_at": None,
+                "notes": "Final inspection complete. Awaiting payment.",
+                "created_at": now - timedelta(days=20),
+            },
+            {
+                "invoice_id": "inv_005",
+                "project_id": "proj_001",
+                "invoice_number": "INV-2026-004",
+                "title": "Henderson - Design & Survey Fee",
+                "description": "Drone survey, 3D design, and project planning",
+                "amount": 5500.0,
+                "tax_rate": 7.5,
+                "tax_amount": 412.50,
+                "total": 5912.50,
+                "status": "Paid",
+                "due_date": date(2026, 3, 1),
+                "paid_at": now - timedelta(days=40),
+                "notes": "Design phase fee collected.",
+                "created_at": now - timedelta(days=42),
+            },
+        ]
+        for inv in invoices_data:
+            db.add(models.Invoice(**inv))
+
+        # Line Items
+        line_items_data = [
+            # inv_001 - Foster Deposit
+            {"invoice_id": "inv_001", "description": "Pool construction deposit (30%)", "quantity": 1, "unit_price": 37500.0, "amount": 37500.0, "sort_order": 0},
+            {"invoice_id": "inv_001", "description": "Outdoor kitchen deposit (30%)", "quantity": 1, "unit_price": 22500.0, "amount": 22500.0, "sort_order": 1},
+            {"invoice_id": "inv_001", "description": "Pergola deposit (30%)", "quantity": 1, "unit_price": 10500.0, "amount": 10500.0, "sort_order": 2},
+            {"invoice_id": "inv_001", "description": "Landscape lighting deposit (30%)", "quantity": 1, "unit_price": 9000.0, "amount": 9000.0, "sort_order": 3},
+            # inv_002 - Foster Midpoint
+            {"invoice_id": "inv_002", "description": "Pool shell completion (40%)", "quantity": 1, "unit_price": 50000.0, "amount": 50000.0, "sort_order": 0},
+            {"invoice_id": "inv_002", "description": "Outdoor kitchen framing (40%)", "quantity": 1, "unit_price": 30000.0, "amount": 30000.0, "sort_order": 1},
+            {"invoice_id": "inv_002", "description": "Pergola materials (40%)", "quantity": 1, "unit_price": 14000.0, "amount": 14000.0, "sort_order": 2},
+            {"invoice_id": "inv_002", "description": "Lighting fixtures procurement", "quantity": 1, "unit_price": 12000.0, "amount": 12000.0, "sort_order": 3},
+            # inv_003 - Wilson Final
+            {"invoice_id": "inv_003", "description": "Pool completion - final payment", "quantity": 1, "unit_price": 18400.0, "amount": 18400.0, "sort_order": 0},
+            {"invoice_id": "inv_003", "description": "Travertine deck - final payment", "quantity": 1, "unit_price": 6200.0, "amount": 6200.0, "sort_order": 1},
+            {"invoice_id": "inv_003", "description": "Landscape refresh - final payment", "quantity": 1, "unit_price": 3000.0, "amount": 3000.0, "sort_order": 2},
+            # inv_004 - Patel Final
+            {"invoice_id": "inv_004", "description": "Kitchen appliance installation", "quantity": 1, "unit_price": 8500.0, "amount": 8500.0, "sort_order": 0},
+            {"invoice_id": "inv_004", "description": "Granite countertop installation", "quantity": 1, "unit_price": 6200.0, "amount": 6200.0, "sort_order": 1},
+            {"invoice_id": "inv_004", "description": "Final finish work and cleanup", "quantity": 1, "unit_price": 4160.0, "amount": 4160.0, "sort_order": 2},
+            {"invoice_id": "inv_004", "description": "Permit close-out & inspection", "quantity": 1, "unit_price": 2500.0, "amount": 2500.0, "sort_order": 3},
+            # inv_005 - Henderson Design
+            {"invoice_id": "inv_005", "description": "Drone survey (2 flights)", "quantity": 1, "unit_price": 1500.0, "amount": 1500.0, "sort_order": 0},
+            {"invoice_id": "inv_005", "description": "3D design & rendering (2 options)", "quantity": 1, "unit_price": 3000.0, "amount": 3000.0, "sort_order": 1},
+            {"invoice_id": "inv_005", "description": "Project planning & scope document", "quantity": 1, "unit_price": 1000.0, "amount": 1000.0, "sort_order": 2},
+        ]
+        for li in line_items_data:
+            db.add(models.InvoiceLineItem(**li))
+
+        # ── Payments ────────────────────────────────────────────────
+        payments_data = [
+            {"invoice_id": "inv_001", "amount": 85462.50, "method": "check", "notes": "Check #4521 from Foster", "paid_at": now - timedelta(days=55)},
+            {"invoice_id": "inv_003", "amount": 29670.0, "method": "bank_transfer", "notes": "Wire transfer from Wilson", "paid_at": now - timedelta(days=65)},
+            {"invoice_id": "inv_005", "amount": 5912.50, "method": "check", "notes": "Check #1187 from Henderson", "paid_at": now - timedelta(days=40)},
+        ]
+        for pay in payments_data:
+            db.add(models.Payment(**pay))
+
+        # ── Payment Schedules ───────────────────────────────────────
+        payment_schedules_data = [
+            # Foster project schedule
+            {"project_id": "proj_003", "milestone": "Deposit", "percentage": 30, "amount": 85462.50, "due_date": date(2026, 1, 15), "status": "Paid", "invoice_id": "inv_001", "sort_order": 0},
+            {"project_id": "proj_003", "milestone": "Midpoint", "percentage": 40, "amount": 113950.0, "due_date": date(2026, 4, 30), "status": "Invoiced", "invoice_id": "inv_002", "sort_order": 1},
+            {"project_id": "proj_003", "milestone": "Final Completion", "percentage": 30, "amount": 85462.50, "due_date": date(2026, 9, 30), "status": "Pending", "invoice_id": None, "sort_order": 2},
+            # Henderson project schedule
+            {"project_id": "proj_001", "milestone": "Design Fee", "percentage": 3, "amount": 5912.50, "due_date": date(2026, 3, 1), "status": "Paid", "invoice_id": "inv_005", "sort_order": 0},
+            {"project_id": "proj_001", "milestone": "Deposit", "percentage": 30, "amount": 52500.0, "due_date": None, "status": "Pending", "invoice_id": None, "sort_order": 1},
+            {"project_id": "proj_001", "milestone": "Midpoint", "percentage": 40, "amount": 70000.0, "due_date": None, "status": "Pending", "invoice_id": None, "sort_order": 2},
+            {"project_id": "proj_001", "milestone": "Final Completion", "percentage": 27, "amount": 47250.0, "due_date": None, "status": "Pending", "invoice_id": None, "sort_order": 3},
+        ]
+        for ps in payment_schedules_data:
+            db.add(models.PaymentSchedule(**ps))
+
         db.commit()
         print(f"Demo data seeded: {len(leads_data)} leads, {len(projects_data)} projects, "
               f"{len(contractors_data)} contractors, 3 bid packages, 7 bids, "
-              f"{len(activities)} activity entries, {len(automations_data)} automations")
+              f"{len(activities)} activity entries, {len(automations_data)} automations, "
+              f"{len(portal_access_data)} portal access links, {len(design_approvals_data)} design approvals, "
+              f"{len(invoices_data)} invoices, {len(payments_data)} payments, {len(payment_schedules_data)} payment schedules")
 
     except Exception as e:
         db.rollback()

@@ -10,6 +10,9 @@ import Bidding from "./pages/Bidding";
 import Webhooks from "./pages/Webhooks";
 import AskAuvora from "./pages/AskAuvora";
 import Automations from "./pages/Automations";
+import ClientPortal from "./pages/ClientPortal";
+import Invoicing from "./pages/Invoicing";
+import Reports from "./pages/Reports";
 
 function App() {
   return (
@@ -28,6 +31,9 @@ function App() {
             <Route path="/webhooks" element={<Webhooks />} />
             <Route path="/ai" element={<AskAuvora />} />
             <Route path="/automations" element={<Automations />} />
+            <Route path="/client-portal" element={<ClientPortal />} />
+            <Route path="/invoicing" element={<Invoicing />} />
+            <Route path="/reports" element={<Reports />} />
           </Route>
         </Routes>
       </SignedIn>

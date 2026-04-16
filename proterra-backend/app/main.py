@@ -5,7 +5,7 @@ from fastapi.middleware.cors import CORSMiddleware
 from sqlalchemy.orm import Session
 
 from .database import engine, Base, get_db
-from .routes import leads, projects, contractors, bidding, ai_assistant, dashboard, webhooks, automations
+from .routes import leads, projects, contractors, bidding, ai_assistant, dashboard, webhooks, automations, client_portal, invoicing, reports
 from .seed_demo_data import seed_demo_data
 from . import models
 
@@ -34,6 +34,9 @@ app.include_router(ai_assistant.router)
 app.include_router(dashboard.router)
 app.include_router(webhooks.router)
 app.include_router(automations.router)
+app.include_router(client_portal.router)
+app.include_router(invoicing.router)
+app.include_router(reports.router)
 
 
 @app.on_event("startup")
@@ -63,6 +66,12 @@ def reseed_database(
     db.query(models.ProjectFile).delete()
     db.query(models.Project).delete()
     db.query(models.Contractor).delete()
+    db.query(models.Payment).delete()
+    db.query(models.InvoiceLineItem).delete()
+    db.query(models.Invoice).delete()
+    db.query(models.PaymentSchedule).delete()
+    db.query(models.DesignApproval).delete()
+    db.query(models.ClientPortalAccess).delete()
     db.query(models.Lead).delete()
     db.commit()
     # Re-seed
