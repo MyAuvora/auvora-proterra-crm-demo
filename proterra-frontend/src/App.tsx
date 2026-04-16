@@ -1,4 +1,4 @@
-import { Routes, Route } from "react-router-dom";
+import { Routes, Route, useLocation } from "react-router-dom";
 import { SignedIn, SignedOut } from "@clerk/clerk-react";
 import Layout from "./components/Layout";
 import { SignInPage } from "./components/SignInPage";
@@ -16,8 +16,20 @@ import Reports from "./pages/Reports";
 import LeadDetail from "./pages/LeadDetail";
 import ProjectDetail from "./pages/ProjectDetail";
 import ContractorDetail from "./pages/ContractorDetail";
+import LeadIntake from "./pages/LeadIntake";
 
 function App() {
+  const location = useLocation();
+
+  // Public routes that don't require authentication
+  if (location.pathname === "/intake") {
+    return (
+      <Routes>
+        <Route path="/intake" element={<LeadIntake />} />
+      </Routes>
+    );
+  }
+
   return (
     <>
       <SignedOut>
