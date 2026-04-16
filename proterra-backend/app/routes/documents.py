@@ -1,7 +1,6 @@
 """Document upload/download/delete endpoints for ProTerra CRM."""
 import os
 import uuid
-import shutil
 from datetime import datetime
 from fastapi import APIRouter, Depends, UploadFile, File, Form, HTTPException, Query
 from fastapi.responses import FileResponse

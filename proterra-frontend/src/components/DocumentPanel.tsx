@@ -70,7 +70,7 @@ export default function DocumentPanel({
   const [showUpload, setShowUpload] = useState(false);
   const [uploadCategory, setUploadCategory] = useState("other");
   const [uploadDescription, setUploadDescription] = useState("");
-  const [previewUrl, setPreviewUrl] = useState<string | null>(null);
+  const [previewDoc, setPreviewDoc] = useState<DocumentItem | null>(null);
   const fileInputRef = useRef<HTMLInputElement>(null);
 
   const loadDocuments = () => {
@@ -118,7 +118,7 @@ export default function DocumentPanel({
 
   const handlePreview = (doc: DocumentItem) => {
     if (doc.content_type.startsWith("image/") || doc.content_type === "application/pdf") {
-      setPreviewUrl(getDocumentDownloadUrl(doc.document_id));
+      setPreviewDoc(doc);
     } else {
       handleDownload(doc.document_id);
     }
@@ -277,26 +277,26 @@ export default function DocumentPanel({
       </Card>
 
       {/* Preview Modal */}
-      {previewUrl && (
+      {previewDoc && (
         <div
           className="fixed inset-0 z-50 bg-black/60 flex items-center justify-center p-4"
-          onClick={() => setPreviewUrl(null)}
+          onClick={() => setPreviewDoc(null)}
         >
           <div
             className="bg-white rounded-xl shadow-2xl max-w-4xl max-h-[90vh] w-full overflow-hidden"
             onClick={(e) => e.stopPropagation()}
           >
             <div className="flex items-center justify-between p-4 border-b">
-              <h3 className="text-sm font-medium text-slate-700">Preview</h3>
-              <Button size="sm" variant="ghost" onClick={() => setPreviewUrl(null)}>
+              <h3 className="text-sm font-medium text-slate-700">{previewDoc.original_filename}</h3>
+              <Button size="sm" variant="ghost" onClick={() => setPreviewDoc(null)}>
                 <X className="h-4 w-4" />
               </Button>
             </div>
             <div className="p-4 overflow-auto max-h-[80vh]">
-              {previewUrl.includes("image") || previewUrl.endsWith(".png") || previewUrl.endsWith(".jpg") ? (
-                <img src={previewUrl} alt="Preview" className="max-w-full mx-auto rounded-lg" />
+              {previewDoc.content_type.startsWith("image/") ? (
+                <img src={getDocumentDownloadUrl(previewDoc.document_id)} alt={previewDoc.original_filename} className="max-w-full mx-auto rounded-lg" />
               ) : (
-                <iframe src={previewUrl} className="w-full h-[70vh] rounded-lg border" title="Document Preview" />
+                <iframe src={getDocumentDownloadUrl(previewDoc.document_id)} className="w-full h-[70vh] rounded-lg border" title="Document Preview" />
               )}
             </div>
           </div>
