@@ -7,12 +7,11 @@ The execution engine evaluates automations when relevant events occur.
 import os
 import json
 from datetime import datetime
-from typing import Optional, List
+from typing import Optional
 
 from fastapi import APIRouter, Depends, HTTPException
 from pydantic import BaseModel
 from sqlalchemy.orm import Session
-from sqlalchemy import func
 
 from ..database import get_db
 from .. import models
@@ -48,6 +47,126 @@ class AIAutomationRequest(BaseModel):
 
 
 # ── CRUD Endpoints ────────────────────────────────────────────────────
+
+# AI endpoints MUST be registered before /{automation_id} to avoid path conflicts
+@router.post("/ai/create")
+def ai_create_automation(data: AIAutomationRequest, db: Session = Depends(get_db)):
+    """Use AI to create an automation from a natural language description."""
+    if not OPENAI_API_KEY:
+        return _fallback_ai_create(data.prompt, db)
+
+    try:
+        from openai import OpenAI
+        client = OpenAI(api_key=OPENAI_API_KEY)
+
+        system_prompt = _build_ai_automation_prompt(db)
+
+        response = client.chat.completions.create(
+            model="gpt-4o-mini",
+            messages=[
+                {"role": "system", "content": system_prompt},
+                {"role": "user", "content": data.prompt},
+            ],
+            max_tokens=1500,
+            temperature=0.3,
+            response_format={"type": "json_object"},
+        )
+
+        result = json.loads(response.choices[0].message.content)
+
+        if not result.get("name") or not result.get("trigger_type"):
+            return {
+                "status": "clarification_needed",
+                "message": result.get("message", "I need more details to create this automation. Could you specify what should trigger it and what action should be taken?"),
+                "suggestion": result,
+            }
+
+        auto = models.Automation(
+            name=result["name"],
+            description=result.get("description", ""),
+            trigger_type=result["trigger_type"],
+            trigger_config=json.dumps(result.get("trigger_config", {})),
+            conditions=json.dumps(result.get("conditions", [])),
+            actions=json.dumps(result.get("actions", [])),
+            enabled=True,
+        )
+        db.add(auto)
+        db.commit()
+        db.refresh(auto)
+
+        _log_activity(db, "automation", auto.automation_id, "created", f"AI created automation '{auto.name}'")
+
+        return {
+            "status": "created",
+            "message": f"I've created the automation '{auto.name}'. {result.get('explanation', '')}",
+            "automation": _serialize_automation(auto),
+        }
+
+    except Exception:
+        return _fallback_ai_create(data.prompt, db)
+
+
+@router.get("/ai/suggestions")
+def get_automation_suggestions(db: Session = Depends(get_db)):
+    """Get AI-suggested automations based on current CRM state."""
+    suggestions = []
+
+    new_leads = db.query(models.Lead).filter(models.Lead.status == "New Lead").count()
+    if new_leads > 3:
+        suggestions.append({
+            "prompt": "Automatically move new leads to 'Contacted' status after I log a note",
+            "description": "Auto-advance leads after contact is made",
+            "category": "lead_management",
+        })
+
+    total_leads = db.query(models.Lead).count()
+    if total_leads > 5:
+        suggestions.append({
+            "prompt": "Send me a daily summary of my lead pipeline and any stale leads older than 7 days",
+            "description": "Daily lead pipeline digest",
+            "category": "reporting",
+        })
+
+    active_projects = db.query(models.Project).filter(
+        models.Project.status.notin_(["Complete", "Cancelled"])
+    ).count()
+    if active_projects > 0:
+        suggestions.append({
+            "prompt": "Notify me when a project has been in the same status for more than 2 weeks",
+            "description": "Stalled project alerts",
+            "category": "project_tracking",
+        })
+
+    open_packages = db.query(models.BidPackage).filter(models.BidPackage.status == "Open").count()
+    if open_packages > 0:
+        suggestions.append({
+            "prompt": "Alert me when all contractors have submitted bids for a package so I can start comparing",
+            "description": "Bid completion notifications",
+            "category": "bidding",
+        })
+
+    contractors = db.query(models.Contractor).filter(models.Contractor.active == True).count()
+    if contractors > 3:
+        suggestions.append({
+            "prompt": "When a new bid package is created, automatically invite contractors whose specialty matches the project type",
+            "description": "Auto-invite matching contractors to bid",
+            "category": "bidding",
+        })
+
+    suggestions.append({
+        "prompt": "When a lead is converted to a project, automatically create the standard task checklist",
+        "description": "Auto-create project tasks on conversion",
+        "category": "project_setup",
+    })
+
+    suggestions.append({
+        "prompt": "When a bid is awarded, change the project status to 'Builder Selected' and log the activity",
+        "description": "Auto-update project on bid award",
+        "category": "bidding",
+    })
+
+    return {"suggestions": suggestions}
+
 
 @router.get("")
 def list_automations(db: Session = Depends(get_db)):
@@ -157,132 +276,6 @@ def get_automation_logs(automation_id: str, db: Session = Depends(get_db)):
         "error_message": l.error_message,
         "executed_at": l.executed_at.isoformat() if l.executed_at else None,
     } for l in logs]
-
-
-# ── AI-Powered Automation Creation ────────────────────────────────────
-
-@router.post("/ai/create")
-def ai_create_automation(data: AIAutomationRequest, db: Session = Depends(get_db)):
-    """Use AI to create an automation from a natural language description."""
-    if not OPENAI_API_KEY:
-        return _fallback_ai_create(data.prompt, db)
-
-    try:
-        from openai import OpenAI
-        client = OpenAI(api_key=OPENAI_API_KEY)
-
-        # Build context about what's available
-        system_prompt = _build_ai_automation_prompt(db)
-
-        response = client.chat.completions.create(
-            model="gpt-4o-mini",
-            messages=[
-                {"role": "system", "content": system_prompt},
-                {"role": "user", "content": data.prompt},
-            ],
-            max_tokens=1500,
-            temperature=0.3,
-            response_format={"type": "json_object"},
-        )
-
-        result = json.loads(response.choices[0].message.content)
-
-        # Validate required fields
-        if not result.get("name") or not result.get("trigger_type"):
-            return {
-                "status": "clarification_needed",
-                "message": result.get("message", "I need more details to create this automation. Could you specify what should trigger it and what action should be taken?"),
-                "suggestion": result,
-            }
-
-        # Create the automation
-        auto = models.Automation(
-            name=result["name"],
-            description=result.get("description", ""),
-            trigger_type=result["trigger_type"],
-            trigger_config=json.dumps(result.get("trigger_config", {})),
-            conditions=json.dumps(result.get("conditions", [])),
-            actions=json.dumps(result.get("actions", [])),
-            enabled=True,
-        )
-        db.add(auto)
-        db.commit()
-        db.refresh(auto)
-
-        _log_activity(db, "automation", auto.automation_id, "created", f"AI created automation '{auto.name}'")
-
-        return {
-            "status": "created",
-            "message": f"I've created the automation '{auto.name}'. {result.get('explanation', '')}",
-            "automation": _serialize_automation(auto),
-        }
-
-    except Exception as e:
-        return _fallback_ai_create(data.prompt, db)
-
-
-@router.get("/ai/suggestions")
-def get_automation_suggestions(db: Session = Depends(get_db)):
-    """Get AI-suggested automations based on current CRM state."""
-    suggestions = []
-
-    # Check for patterns that could benefit from automation
-    new_leads = db.query(models.Lead).filter(models.Lead.status == "New Lead").count()
-    if new_leads > 3:
-        suggestions.append({
-            "prompt": "Automatically move new leads to 'Contacted' status after I log a note",
-            "description": "Auto-advance leads after contact is made",
-            "category": "lead_management",
-        })
-
-    total_leads = db.query(models.Lead).count()
-    if total_leads > 5:
-        suggestions.append({
-            "prompt": "Send me a daily summary of my lead pipeline and any stale leads older than 7 days",
-            "description": "Daily lead pipeline digest",
-            "category": "reporting",
-        })
-
-    active_projects = db.query(models.Project).filter(
-        models.Project.status.notin_(["Complete", "Cancelled"])
-    ).count()
-    if active_projects > 0:
-        suggestions.append({
-            "prompt": "Notify me when a project has been in the same status for more than 2 weeks",
-            "description": "Stalled project alerts",
-            "category": "project_tracking",
-        })
-
-    open_packages = db.query(models.BidPackage).filter(models.BidPackage.status == "Open").count()
-    if open_packages > 0:
-        suggestions.append({
-            "prompt": "Alert me when all contractors have submitted bids for a package so I can start comparing",
-            "description": "Bid completion notifications",
-            "category": "bidding",
-        })
-
-    contractors = db.query(models.Contractor).filter(models.Contractor.active == True).count()
-    if contractors > 3:
-        suggestions.append({
-            "prompt": "When a new bid package is created, automatically invite contractors whose specialty matches the project type",
-            "description": "Auto-invite matching contractors to bid",
-            "category": "bidding",
-        })
-
-    # Always suggest these
-    suggestions.append({
-        "prompt": "When a lead is converted to a project, automatically create the standard task checklist",
-        "description": "Auto-create project tasks on conversion",
-        "category": "project_setup",
-    })
-
-    suggestions.append({
-        "prompt": "When a bid is awarded, change the project status to 'Builder Selected' and log the activity",
-        "description": "Auto-update project on bid award",
-        "category": "bidding",
-    })
-
-    return {"suggestions": suggestions}
 
 
 # ── Execution Engine ──────────────────────────────────────────────────
