@@ -1,5 +1,6 @@
 import { useState } from "react";
 import { NavLink, Outlet } from "react-router-dom";
+import { UserButton } from "@clerk/clerk-react";
 import {
   LayoutDashboard,
   Users,
@@ -108,9 +109,12 @@ export default function Layout() {
             {sidebarOpen ? <X className="h-6 w-6" /> : <Menu className="h-6 w-6" />}
           </button>
           <div className="flex-1" />
-          <div className="flex items-center gap-2 text-sm text-stone-500">
-            <div className="h-2 w-2 rounded-full bg-green-500 animate-pulse" />
-            ProTerra Design &mdash; Florida & Alabama Gulf Coast
+          <div className="flex items-center gap-4">
+            <div className="flex items-center gap-2 text-sm text-stone-500">
+              <div className="h-2 w-2 rounded-full bg-green-500 animate-pulse" />
+              ProTerra Design &mdash; Florida &amp; Alabama Gulf Coast
+            </div>
+            <UserButton afterSignOutUrl="/" />
           </div>
         </header>
 
