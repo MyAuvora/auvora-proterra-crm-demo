@@ -7,6 +7,7 @@ from sqlalchemy.orm import Session
 
 from ..database import get_db
 from .. import models
+from .automations import execute_automations
 
 router = APIRouter(prefix="/api/leads", tags=["Leads"])
 
@@ -77,6 +78,17 @@ def create_lead(data: LeadCreate, db: Session = Depends(get_db)):
     db.add(log)
     db.commit()
     db.refresh(lead)
+
+    # Fire automations for lead_created
+    try:
+        execute_automations(db, "lead_created", "lead", lead.lead_id, {
+            "full_name": lead.full_name, "email": lead.email,
+            "source": lead.source, "project_type": lead.project_type,
+            "budget_range": lead.budget_range, "status": lead.status,
+        })
+    except Exception:
+        pass  # Don't fail lead creation if automation errors
+
     return lead
 
 
@@ -103,6 +115,18 @@ def update_lead(lead_id: str, data: LeadUpdate, db: Session = Depends(get_db)):
 
     db.commit()
     db.refresh(lead)
+
+    # Fire automations for lead_status_changed
+    if "status" in update_data and update_data["status"] != old_status:
+        try:
+            execute_automations(db, "lead_status_changed", "lead", lead_id, {
+                "full_name": lead.full_name, "from_status": old_status,
+                "to_status": lead.status, "status": lead.status,
+                "project_type": lead.project_type, "budget_range": lead.budget_range,
+            })
+        except Exception:
+            pass
+
     return lead
 
 

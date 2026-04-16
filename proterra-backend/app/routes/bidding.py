@@ -7,6 +7,7 @@ from sqlalchemy.orm import Session
 
 from ..database import get_db
 from .. import models
+from .automations import execute_automations
 
 router = APIRouter(prefix="/api/bidding", tags=["Bidding"])
 
@@ -125,6 +126,16 @@ def create_bid_package(data: BidPackageCreate, db: Session = Depends(get_db)):
     db.add(log)
     db.commit()
     db.refresh(bp)
+
+    # Fire automations for bid_package_created
+    try:
+        execute_automations(db, "bid_package_created", "bid_package", bp.package_id, {
+            "package_id": bp.package_id, "project_id": bp.project_id,
+            "title": bp.title, "project_type": proj.project_type if proj else "",
+        })
+    except Exception:
+        pass
+
     return bp
 
 
@@ -228,6 +239,16 @@ def create_bid(data: BidCreate, db: Session = Depends(get_db)):
     db.add(bid)
     db.commit()
     db.refresh(bid)
+
+    # Fire automations for bid_submitted
+    try:
+        execute_automations(db, "bid_submitted", "bid", bid.bid_id, {
+            "package_id": bid.package_id, "contractor_id": bid.contractor_id,
+            "total_price": str(bid.total_price), "status": bid.status,
+        })
+    except Exception:
+        pass
+
     return bid
 
 
@@ -287,6 +308,17 @@ def award_bid(bid_id: str, db: Session = Depends(get_db)):
 
     db.commit()
     db.refresh(bid)
+
+    # Fire automations for bid_awarded
+    try:
+        execute_automations(db, "bid_awarded", "bid", bid.bid_id, {
+            "package_id": bid.package_id, "contractor_id": bid.contractor_id,
+            "project_id": bp.project_id if bp else "",
+            "total_price": str(bid.total_price),
+        })
+    except Exception:
+        pass
+
     return bid
 
 

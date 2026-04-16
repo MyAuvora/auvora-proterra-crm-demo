@@ -9,6 +9,7 @@ import Contractors from "./pages/Contractors";
 import Bidding from "./pages/Bidding";
 import Webhooks from "./pages/Webhooks";
 import AskAuvora from "./pages/AskAuvora";
+import Automations from "./pages/Automations";
 
 function App() {
   return (
@@ -26,6 +27,7 @@ function App() {
             <Route path="/bidding" element={<Bidding />} />
             <Route path="/webhooks" element={<Webhooks />} />
             <Route path="/ai" element={<AskAuvora />} />
+            <Route path="/automations" element={<Automations />} />
           </Route>
         </Routes>
       </SignedIn>

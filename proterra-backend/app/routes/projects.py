@@ -7,6 +7,7 @@ from sqlalchemy.orm import Session
 
 from ..database import get_db
 from .. import models
+from .automations import execute_automations
 
 router = APIRouter(prefix="/api/projects", tags=["Projects"])
 
@@ -162,6 +163,18 @@ def update_project(project_id: str, data: ProjectUpdate, db: Session = Depends(g
 
     db.commit()
     db.refresh(proj)
+
+    # Fire automations for project_status_changed
+    if "status" in update_data and update_data["status"] != old_status:
+        try:
+            execute_automations(db, "project_status_changed", "project", project_id, {
+                "client_name": proj.client_name, "from_status": old_status,
+                "to_status": proj.status, "status": proj.status,
+                "project_type": proj.project_type, "project_id": project_id,
+            })
+        except Exception:
+            pass
+
     return proj
 
 

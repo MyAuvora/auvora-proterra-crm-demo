@@ -781,9 +781,82 @@ def seed_demo_data():
                 created_at=created_at,
             ))
 
+        # ── Demo Automations ─────────────────────────────────────────
+        import json
+        automations_data = [
+            {
+                "automation_id": "auto_001",
+                "name": "New lead follow-up reminder",
+                "description": "Log a follow-up reminder when a new lead is created from the website",
+                "trigger_type": "lead_created",
+                "trigger_config": json.dumps({}),
+                "conditions": json.dumps([]),
+                "actions": json.dumps([
+                    {"type": "log_notification", "message": "New lead {full_name} needs follow-up within 24 hours"},
+                    {"type": "create_activity", "message": "Follow-up reminder: Contact new lead promptly"},
+                ]),
+                "enabled": True,
+                "run_count": 5,
+                "last_run_at": now - timedelta(days=1),
+                "created_at": now - timedelta(days=30),
+            },
+            {
+                "automation_id": "auto_002",
+                "name": "Bid submission alert",
+                "description": "Notify when a contractor submits a bid for review",
+                "trigger_type": "bid_submitted",
+                "trigger_config": json.dumps({}),
+                "conditions": json.dumps([]),
+                "actions": json.dumps([
+                    {"type": "log_notification", "message": "A new bid has been submitted and needs review"},
+                    {"type": "create_activity", "message": "Bid submitted - ready for comparison"},
+                ]),
+                "enabled": True,
+                "run_count": 7,
+                "last_run_at": now - timedelta(days=3),
+                "created_at": now - timedelta(days=28),
+            },
+            {
+                "automation_id": "auto_003",
+                "name": "Auto-update project on bid award",
+                "description": "When a bid is awarded, move the project to Builder Selected status",
+                "trigger_type": "bid_awarded",
+                "trigger_config": json.dumps({}),
+                "conditions": json.dumps([]),
+                "actions": json.dumps([
+                    {"type": "change_status", "entity": "project", "value": "Builder Selected"},
+                    {"type": "log_notification", "message": "Bid awarded! Project moved to Builder Selected"},
+                ]),
+                "enabled": True,
+                "run_count": 2,
+                "last_run_at": now - timedelta(days=10),
+                "created_at": now - timedelta(days=25),
+            },
+            {
+                "automation_id": "auto_004",
+                "name": "Auto-invite matching contractors",
+                "description": "When a bid package is created, invite contractors whose specialty matches",
+                "trigger_type": "bid_package_created",
+                "trigger_config": json.dumps({}),
+                "conditions": json.dumps([]),
+                "actions": json.dumps([
+                    {"type": "invite_contractors", "specialty": ""},
+                    {"type": "log_notification", "message": "Contractors auto-invited to new bid package"},
+                ]),
+                "enabled": False,
+                "run_count": 0,
+                "last_run_at": None,
+                "created_at": now - timedelta(days=15),
+            },
+        ]
+
+        for ad in automations_data:
+            db.add(models.Automation(**ad))
+
         db.commit()
         print(f"Demo data seeded: {len(leads_data)} leads, {len(projects_data)} projects, "
-              f"{len(contractors_data)} contractors, 3 bid packages, 7 bids, {len(activities)} activity entries")
+              f"{len(contractors_data)} contractors, 3 bid packages, 7 bids, "
+              f"{len(activities)} activity entries, {len(automations_data)} automations")
 
     except Exception as e:
         db.rollback()
