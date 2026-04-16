@@ -1,4 +1,5 @@
 import os
+import shutil
 
 from fastapi import FastAPI, Depends, Header, HTTPException
 from fastapi.middleware.cors import CORSMiddleware
@@ -6,6 +7,7 @@ from sqlalchemy.orm import Session
 
 from .database import engine, Base, get_db
 from .routes import leads, projects, contractors, bidding, ai_assistant, dashboard, webhooks, automations, client_portal, invoicing, reports, documents
+from .routes.documents import UPLOAD_DIR
 from .seed_demo_data import seed_demo_data
 from . import models
 
@@ -61,6 +63,10 @@ def reseed_database(
         raise HTTPException(status_code=403, detail="Forbidden")
     # Delete all data in reverse dependency order
     db.query(models.Document).delete()
+    # Clean up uploaded files from disk
+    if os.path.isdir(UPLOAD_DIR):
+        shutil.rmtree(UPLOAD_DIR)
+        os.makedirs(UPLOAD_DIR, exist_ok=True)
     db.query(models.ActivityLog).delete()
     db.query(models.Payment).delete()
     db.query(models.InvoiceLineItem).delete()
