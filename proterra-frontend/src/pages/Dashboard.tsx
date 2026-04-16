@@ -2,7 +2,8 @@ import { useEffect, useState } from "react";
 import { useNavigate } from "react-router-dom";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { getDashboard } from "@/lib/api";
-import { Users, FolderKanban, HardHat, DollarSign, TrendingUp, Gavel, Activity, BarChart3 } from "lucide-react";
+import { Users, FolderKanban, HardHat, DollarSign, TrendingUp, Gavel, Activity, BarChart3, Share2, Copy, CheckCircle2, ExternalLink } from "lucide-react";
+import { Button } from "@/components/ui/button";
 
 interface DashboardData {
   leads: {
@@ -51,6 +52,13 @@ export default function Dashboard() {
   const navigate = useNavigate();
   const [data, setData] = useState<DashboardData | null>(null);
   const [loading, setLoading] = useState(true);
+  const [linkCopied, setLinkCopied] = useState(false);
+
+  const copyIntakeLink = () => {
+    navigator.clipboard.writeText(`${window.location.origin}/intake`);
+    setLinkCopied(true);
+    setTimeout(() => setLinkCopied(false), 2000);
+  };
 
   useEffect(() => {
     getDashboard()
@@ -91,6 +99,46 @@ export default function Dashboard() {
           </p>
         </div>
       </div>
+
+      {/* Lead Intake Form Link */}
+      <Card className="border-0 shadow-md overflow-hidden">
+        <div className="flex items-center justify-between flex-wrap gap-3 bg-gradient-to-r from-sky-50 to-cyan-50 p-4 border border-sky-100 rounded-xl">
+          <div className="flex items-center gap-3">
+            <div className="flex h-10 w-10 items-center justify-center rounded-lg bg-gradient-to-br from-sky-500 to-cyan-500 text-white shadow-sm">
+              <Share2 className="h-5 w-5" />
+            </div>
+            <div>
+              <p className="text-sm font-semibold text-slate-800">Lead Intake Form</p>
+              <p className="text-xs text-slate-500">Share this link to capture leads from your website &amp; social media</p>
+            </div>
+          </div>
+          <div className="flex items-center gap-2">
+            <code className="hidden sm:block text-xs bg-white border border-slate-200 px-3 py-1.5 rounded-lg font-mono text-slate-600 truncate max-w-xs">
+              {window.location.origin}/intake
+            </code>
+            <a
+              href={`${window.location.origin}/intake`}
+              target="_blank"
+              rel="noopener noreferrer"
+              className="flex items-center gap-1 rounded-lg border border-slate-200 bg-white px-3 py-1.5 text-xs font-medium text-slate-600 hover:bg-slate-50 transition"
+            >
+              <ExternalLink className="h-3.5 w-3.5" />
+              Preview
+            </a>
+            <Button
+              size="sm"
+              onClick={copyIntakeLink}
+              className="bg-gradient-to-r from-sky-600 to-cyan-500 text-white hover:opacity-90 shadow-sm"
+            >
+              {linkCopied ? (
+                <><CheckCircle2 className="h-3.5 w-3.5 mr-1" /> Copied!</>
+              ) : (
+                <><Copy className="h-3.5 w-3.5 mr-1" /> Copy Link</>
+              )}
+            </Button>
+          </div>
+        </div>
+      </Card>
 
       {/* Stat Cards with gradients */}
       <div className="grid grid-cols-1 gap-4 sm:grid-cols-2 lg:grid-cols-3">
