@@ -1,4 +1,5 @@
 import { useEffect, useState } from "react";
+import { useNavigate } from "react-router-dom";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
@@ -43,6 +44,7 @@ const statusColors: Record<string, string> = {
 };
 
 export default function Leads() {
+  const navigate = useNavigate();
   const [leads, setLeads] = useState<Lead[]>([]);
   const [loading, setLoading] = useState(true);
   const [dialogOpen, setDialogOpen] = useState(false);
@@ -133,7 +135,7 @@ export default function Leads() {
       {/* Kanban-style columns */}
       <div className="grid grid-cols-1 gap-4 xl:grid-cols-3 2xl:grid-cols-4">
         {leads.map((lead) => (
-          <Card key={lead.lead_id} className="border-0 shadow-sm hover:shadow-lg transition-all duration-300 hover:-translate-y-0.5">
+          <Card key={lead.lead_id} className="border-0 shadow-sm hover:shadow-lg transition-all duration-300 hover:-translate-y-0.5 cursor-pointer" onClick={() => navigate(`/leads/${lead.lead_id}`)}>
             <CardHeader className="pb-3">
               <div className="flex items-start justify-between">
                 <CardTitle className="text-base">{lead.full_name}</CardTitle>
@@ -168,7 +170,7 @@ export default function Leads() {
                 <p className="text-sm text-slate-400 truncate">{lead.notes}</p>
               )}
 
-              <div className="flex items-center gap-2 pt-2 border-t">
+              <div className="flex items-center gap-2 pt-2 border-t" onClick={(e) => e.stopPropagation()}>
                 <Select
                   value={lead.status}
                   onChange={(e) => handleStatusChange(lead.lead_id, e.target.value)}

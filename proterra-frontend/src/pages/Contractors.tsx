@@ -1,4 +1,5 @@
 import { useEffect, useState } from "react";
+import { useNavigate } from "react-router-dom";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
@@ -35,6 +36,7 @@ const SPECIALTIES = [
 ];
 
 export default function Contractors() {
+  const navigate = useNavigate();
   const [contractors, setContractors] = useState<Contractor[]>([]);
   const [loading, setLoading] = useState(true);
   const [dialogOpen, setDialogOpen] = useState(false);
@@ -108,7 +110,7 @@ export default function Contractors() {
       {/* Contractor Cards */}
       <div className="grid grid-cols-1 gap-4 md:grid-cols-2 xl:grid-cols-3">
         {contractors.map((c) => (
-          <Card key={c.contractor_id} className="border-0 shadow-sm hover:shadow-lg transition-all duration-300 hover:-translate-y-0.5">
+          <Card key={c.contractor_id} className="border-0 shadow-sm hover:shadow-lg transition-all duration-300 hover:-translate-y-0.5 cursor-pointer" onClick={() => navigate(`/contractors/${c.contractor_id}`)}>
             <CardHeader className="pb-3">
               <div className="flex items-start justify-between">
                 <div>
@@ -160,7 +162,7 @@ export default function Contractors() {
               </div>
 
               {/* Actions */}
-              <div className="flex items-center gap-2 pt-2">
+              <div className="flex items-center gap-2 pt-2" onClick={(e) => e.stopPropagation()}>
                 <Button
                   size="sm"
                   variant="outline"
