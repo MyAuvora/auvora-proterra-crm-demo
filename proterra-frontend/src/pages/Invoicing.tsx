@@ -196,16 +196,20 @@ function InvoicingContent() {
   const loadData = async () => {
     try {
       setLoadError(null);
+      const errors: string[] = [];
       const [inv, sched, sum, proj] = await Promise.all([
-        getInvoices(filterStatus || undefined).catch(() => []),
-        getPaymentSchedules().catch(() => []),
-        getInvoiceSummary().catch(() => null),
-        getProjects().catch(() => []),
+        getInvoices(filterStatus || undefined).catch((e) => { errors.push("invoices"); console.error("Failed to load invoices:", e); return []; }),
+        getPaymentSchedules().catch((e) => { errors.push("schedules"); console.error("Failed to load schedules:", e); return []; }),
+        getInvoiceSummary().catch((e) => { errors.push("summary"); console.error("Failed to load summary:", e); return null; }),
+        getProjects().catch((e) => { errors.push("projects"); console.error("Failed to load projects:", e); return []; }),
       ]);
       setInvoices(Array.isArray(inv) ? inv : []);
       setSchedules(Array.isArray(sched) ? sched : []);
       setSummary(sum && typeof sum === "object" ? sum : null);
       setProjects(Array.isArray(proj) ? proj : []);
+      if (errors.length === 4) {
+        setLoadError("Failed to load invoicing data. Please check your connection and try again.");
+      }
     } catch (e) {
       console.error("Invoicing loadData error:", e);
       setLoadError(e instanceof Error ? e.message : "Failed to load data");
