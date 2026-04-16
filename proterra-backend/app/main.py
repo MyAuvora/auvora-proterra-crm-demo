@@ -5,7 +5,7 @@ from fastapi.middleware.cors import CORSMiddleware
 from sqlalchemy.orm import Session
 
 from .database import engine, Base, get_db
-from .routes import leads, projects, contractors, bidding, ai_assistant, dashboard, webhooks, automations, client_portal, invoicing, reports
+from .routes import leads, projects, contractors, bidding, ai_assistant, dashboard, webhooks, automations, client_portal, invoicing, reports, documents
 from .seed_demo_data import seed_demo_data
 from . import models
 
@@ -37,6 +37,7 @@ app.include_router(automations.router)
 app.include_router(client_portal.router)
 app.include_router(invoicing.router)
 app.include_router(reports.router)
+app.include_router(documents.router)
 
 
 @app.on_event("startup")
@@ -59,6 +60,7 @@ def reseed_database(
     if not ADMIN_SECRET or x_admin_secret != ADMIN_SECRET:
         raise HTTPException(status_code=403, detail="Forbidden")
     # Delete all data in reverse dependency order
+    db.query(models.Document).delete()
     db.query(models.ActivityLog).delete()
     db.query(models.Payment).delete()
     db.query(models.InvoiceLineItem).delete()

@@ -8,6 +8,7 @@ import { Textarea } from "@/components/ui/textarea";
 import { Select } from "@/components/ui/select";
 import { Badge } from "@/components/ui/badge";
 import { getContractor, updateContractor, deleteContractor } from "@/lib/api";
+import DocumentPanel from "@/components/DocumentPanel";
 import {
   ArrowLeft, Mail, Phone, Star, Award, Calendar,
   Trash2, Save, Edit3, HardHat, Shield, BarChart3,
@@ -279,6 +280,14 @@ export default function ContractorDetail() {
               )}
             </CardContent>
           </Card>
+
+          {/* Documents */}
+          <DocumentPanel
+            entityType="contractor"
+            entityId={contractor.contractor_id}
+            categories={["contract", "insurance", "permit", "quote", "other"]}
+            title="Contracts & Insurance"
+          />
         </div>
 
         {/* Sidebar */}

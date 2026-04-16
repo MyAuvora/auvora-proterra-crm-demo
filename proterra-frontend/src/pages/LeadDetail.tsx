@@ -8,6 +8,7 @@ import { Textarea } from "@/components/ui/textarea";
 import { Select } from "@/components/ui/select";
 import { Badge } from "@/components/ui/badge";
 import { getLead, updateLead, convertLead, deleteLead } from "@/lib/api";
+import DocumentPanel from "@/components/DocumentPanel";
 import {
   ArrowLeft, Mail, Phone, MapPin, Calendar, DollarSign,
   ArrowRightCircle, Trash2, Save, Clock, Tag, Globe, Edit3,
@@ -283,6 +284,14 @@ export default function LeadDetail() {
               )}
             </CardContent>
           </Card>
+
+          {/* Documents */}
+          <DocumentPanel
+            entityType="lead"
+            entityId={lead.lead_id}
+            categories={["contract", "quote", "survey", "photo", "other"]}
+            title="Documents & Quotes"
+          />
         </div>
 
         {/* Sidebar */}

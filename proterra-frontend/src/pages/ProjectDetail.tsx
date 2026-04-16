@@ -8,6 +8,7 @@ import { Textarea } from "@/components/ui/textarea";
 import { Select } from "@/components/ui/select";
 import { Badge } from "@/components/ui/badge";
 import { getProject, updateProject, deleteProject, updateTask } from "@/lib/api";
+import DocumentPanel from "@/components/DocumentPanel";
 import {
   ArrowLeft, Mail, Phone, MapPin, Calendar,
   Trash2, Save, Edit3, CheckCircle2, Circle, FolderKanban,
@@ -335,6 +336,22 @@ export default function ProjectDetail() {
               )}
             </CardContent>
           </Card>
+
+          {/* Designs & Renders */}
+          <DocumentPanel
+            entityType="project"
+            entityId={project.project_id}
+            categories={["design", "render", "blueprint", "photo"]}
+            title="Designs & Renders"
+          />
+
+          {/* Contracts & Documents */}
+          <DocumentPanel
+            entityType="project"
+            entityId={project.project_id}
+            categories={["contract", "quote", "permit", "survey", "other"]}
+            title="Contracts & Documents"
+          />
         </div>
 
         {/* Sidebar */}

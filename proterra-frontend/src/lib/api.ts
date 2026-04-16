@@ -142,6 +142,25 @@ export const createPaymentSchedule = (data: Record<string, unknown>) =>
   request("/api/invoicing/schedules", { method: "POST", body: JSON.stringify(data) });
 export const getInvoiceSummary = () => request("/api/invoicing/summary");
 
+// Documents
+export const getDocuments = (entityType: string, entityId: string, category?: string) =>
+  request(`/api/documents?entity_type=${entityType}&entity_id=${entityId}${category ? `&category=${category}` : ""}`);
+export const uploadDocument = async (file: File, entityType: string, entityId: string, category: string, description: string) => {
+  const formData = new FormData();
+  formData.append("file", file);
+  formData.append("entity_type", entityType);
+  formData.append("entity_id", entityId);
+  formData.append("category", category);
+  formData.append("description", description);
+  const res = await fetch(`${API_URL}/api/documents`, { method: "POST", body: formData });
+  if (!res.ok) { const text = await res.text(); throw new Error(`API error ${res.status}: ${text}`); }
+  return res.json();
+};
+export const deleteDocument = (id: string) =>
+  request(`/api/documents/${id}`, { method: "DELETE" });
+export const getDocumentDownloadUrl = (id: string) =>
+  `${API_URL}/api/documents/${id}/download`;
+
 // Reports
 export const getRevenuePipeline = () => request("/api/reports/revenue-pipeline");
 export const getLeadConversion = () => request("/api/reports/lead-conversion");
