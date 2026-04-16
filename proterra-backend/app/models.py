@@ -300,6 +300,22 @@ class Payment(Base):
     invoice = relationship("Invoice", back_populates="payments")
 
 
+# ── Documents (generic, attached to any entity) ─────────────────────
+class Document(Base):
+    __tablename__ = "documents"
+
+    document_id = Column(String, primary_key=True, default=lambda: gen_id("doc_"))
+    entity_type = Column(String, nullable=False)  # lead, project, contractor
+    entity_id = Column(String, nullable=False)
+    filename = Column(String, nullable=False)
+    original_filename = Column(String, nullable=False)
+    content_type = Column(String, default="")
+    file_size = Column(Integer, default=0)
+    category = Column(String, default="other")  # contract, quote, design, photo, survey, permit, insurance, other
+    description = Column(String, default="")
+    uploaded_at = Column(DateTime, default=datetime.utcnow)
+
+
 class PaymentSchedule(Base):
     __tablename__ = "payment_schedules"
 
