@@ -1,4 +1,4 @@
-import { useEffect, useState } from "react";
+import React, { useEffect, useState } from "react";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
@@ -99,9 +99,10 @@ interface Summary {
 
 interface Project {
   project_id: string;
-  project_name: string;
+  project_name?: string;
   client_name: string;
-  estimated_value: number;
+  project_type?: string;
+  budget_estimate?: number;
 }
 
 const statusColors: Record<string, string> = {
@@ -118,13 +119,48 @@ const scheduleStatusColors: Record<string, string> = {
   Paid: "bg-emerald-100 text-emerald-700 ring-1 ring-emerald-200",
 };
 
-export default function Invoicing() {
+class InvoicingErrorBoundary extends React.Component<
+  { children: React.ReactNode },
+  { hasError: boolean; error: Error | null }
+> {
+  constructor(props: { children: React.ReactNode }) {
+    super(props);
+    this.state = { hasError: false, error: null };
+  }
+  static getDerivedStateFromError(error: Error) {
+    return { hasError: true, error };
+  }
+  componentDidCatch(error: Error, info: React.ErrorInfo) {
+    console.error("Invoicing page error:", error, info);
+  }
+  render() {
+    if (this.state.hasError) {
+      return (
+        <div className="flex flex-col items-center justify-center h-64 gap-4">
+          <AlertCircle className="h-12 w-12 text-red-400" />
+          <h2 className="text-lg font-semibold text-slate-700">Something went wrong</h2>
+          <p className="text-sm text-slate-500">{this.state.error?.message || "Failed to load invoicing page"}</p>
+          <button
+            onClick={() => { this.setState({ hasError: false, error: null }); window.location.reload(); }}
+            className="px-4 py-2 bg-sky-600 text-white rounded-md text-sm hover:bg-sky-700"
+          >
+            Reload Page
+          </button>
+        </div>
+      );
+    }
+    return this.props.children;
+  }
+}
+
+function InvoicingContent() {
   const [tab, setTab] = useState("invoices");
   const [invoices, setInvoices] = useState<Invoice[]>([]);
   const [schedules, setSchedules] = useState<PaymentScheduleItem[]>([]);
   const [summary, setSummary] = useState<Summary | null>(null);
   const [projects, setProjects] = useState<Project[]>([]);
   const [loading, setLoading] = useState(true);
+  const [loadError, setLoadError] = useState<string | null>(null);
   const [expandedInvoice, setExpandedInvoice] = useState<string | null>(null);
   const [invoiceDetails, setInvoiceDetails] = useState<Record<string, Invoice>>({});
   const [invoiceDialogOpen, setInvoiceDialogOpen] = useState(false);
@@ -159,18 +195,24 @@ export default function Invoicing() {
 
   const loadData = async () => {
     try {
+      setLoadError(null);
+      const errors: string[] = [];
       const [inv, sched, sum, proj] = await Promise.all([
-        getInvoices(filterStatus || undefined),
-        getPaymentSchedules(),
-        getInvoiceSummary(),
-        getProjects(),
+        getInvoices(filterStatus || undefined).catch((e) => { errors.push("invoices"); console.error("Failed to load invoices:", e); return []; }),
+        getPaymentSchedules().catch((e) => { errors.push("schedules"); console.error("Failed to load schedules:", e); return []; }),
+        getInvoiceSummary().catch((e) => { errors.push("summary"); console.error("Failed to load summary:", e); return null; }),
+        getProjects().catch((e) => { errors.push("projects"); console.error("Failed to load projects:", e); return []; }),
       ]);
-      setInvoices(inv);
-      setSchedules(sched);
-      setSummary(sum);
-      setProjects(proj);
+      setInvoices(Array.isArray(inv) ? inv : []);
+      setSchedules(Array.isArray(sched) ? sched : []);
+      setSummary(sum && typeof sum === "object" ? sum : null);
+      setProjects(Array.isArray(proj) ? proj : []);
+      if (errors.length === 4) {
+        setLoadError("Failed to load invoicing data. Please check your connection and try again.");
+      }
     } catch (e) {
-      console.error(e);
+      console.error("Invoicing loadData error:", e);
+      setLoadError(e instanceof Error ? e.message : "Failed to load data");
     } finally {
       setLoading(false);
     }
@@ -289,6 +331,21 @@ export default function Invoicing() {
     return (
       <div className="flex items-center justify-center h-64">
         <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-sky-600" />
+      </div>
+    );
+
+  if (loadError)
+    return (
+      <div className="flex flex-col items-center justify-center h-64 gap-4">
+        <AlertCircle className="h-12 w-12 text-red-400" />
+        <h2 className="text-lg font-semibold text-slate-700">Failed to load invoicing data</h2>
+        <p className="text-sm text-slate-500">{loadError}</p>
+        <button
+          onClick={() => { setLoading(true); loadData(); }}
+          className="px-4 py-2 bg-sky-600 text-white rounded-md text-sm hover:bg-sky-700"
+        >
+          Retry
+        </button>
       </div>
     );
 
@@ -602,7 +659,7 @@ export default function Invoicing() {
                 <option value="">Select a project...</option>
                 {projects.map((p) => (
                   <option key={p.project_id} value={p.project_id}>
-                    {p.project_name} ({p.client_name})
+                    {p.project_name || p.client_name || 'Project'} ({p.client_name || ''})
                   </option>
                 ))}
               </Select>
@@ -770,7 +827,7 @@ export default function Invoicing() {
               <option value="">Select a project...</option>
               {projects.map((p) => (
                 <option key={p.project_id} value={p.project_id}>
-                  {p.project_name} (${p.estimated_value.toLocaleString()})
+                  {p.project_name || p.client_name || 'Project'} (${(p.budget_estimate || 0).toLocaleString()})
                 </option>
               ))}
             </Select>
@@ -827,5 +884,13 @@ export default function Invoicing() {
         </div>
       </Dialog>
     </div>
+  );
+}
+
+export default function Invoicing() {
+  return (
+    <InvoicingErrorBoundary>
+      <InvoicingContent />
+    </InvoicingErrorBoundary>
   );
 }
