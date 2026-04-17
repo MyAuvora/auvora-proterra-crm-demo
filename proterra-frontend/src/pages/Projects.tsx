@@ -1,4 +1,5 @@
 import { useEffect, useState } from "react";
+import { useNavigate } from "react-router-dom";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
@@ -47,18 +48,19 @@ const STATUSES = [
 ];
 
 const statusColors: Record<string, string> = {
-  "Property Analysis": "bg-blue-100 text-blue-700",
-  "Drone Survey": "bg-cyan-100 text-cyan-700",
-  "3D Design": "bg-indigo-100 text-indigo-700",
-  "Client Review": "bg-yellow-100 text-yellow-700",
-  "Bidding Phase": "bg-orange-100 text-orange-700",
-  "Contractor Selection": "bg-amber-100 text-amber-700",
-  "Under Construction": "bg-sky-100 text-sky-700",
-  "Final Inspection": "bg-purple-100 text-purple-700",
-  Completed: "bg-green-100 text-green-700",
+  "Property Analysis": "bg-blue-100 text-blue-700 ring-1 ring-blue-200",
+  "Drone Survey": "bg-cyan-100 text-cyan-700 ring-1 ring-cyan-200",
+  "3D Design": "bg-indigo-100 text-indigo-700 ring-1 ring-indigo-200",
+  "Client Review": "bg-amber-50 text-amber-700 ring-1 ring-amber-200",
+  "Bidding Phase": "bg-orange-100 text-orange-700 ring-1 ring-orange-200",
+  "Contractor Selection": "bg-amber-100 text-amber-700 ring-1 ring-amber-200",
+  "Under Construction": "bg-sky-100 text-sky-700 ring-1 ring-sky-200",
+  "Final Inspection": "bg-violet-100 text-violet-700 ring-1 ring-violet-200",
+  Completed: "bg-emerald-100 text-emerald-700 ring-1 ring-emerald-200",
 };
 
 export default function Projects() {
+  const navigate = useNavigate();
   const [projects, setProjects] = useState<Project[]>([]);
   const [loading, setLoading] = useState(true);
   const [dialogOpen, setDialogOpen] = useState(false);
@@ -126,7 +128,7 @@ export default function Projects() {
   if (loading)
     return (
       <div className="flex items-center justify-center h-64">
-        <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-sky-600" />
+        <div className="animate-spin rounded-full h-10 w-10 border-2 border-sky-200 border-t-sky-600" />
       </div>
     );
 
@@ -134,8 +136,8 @@ export default function Projects() {
     <div className="space-y-6">
       <div className="flex items-center justify-between">
         <div>
-          <h1 className="text-3xl font-bold">Project Pipeline</h1>
-          <p className="text-zinc-500 mt-1">{projects.length} projects</p>
+          <h1 className="text-3xl font-bold text-slate-900">Project Pipeline</h1>
+          <p className="text-slate-500 mt-1">{projects.length} projects</p>
         </div>
         <Button onClick={() => setDialogOpen(true)}>
           <Plus className="mr-2 h-4 w-4" /> New Project
@@ -158,12 +160,12 @@ export default function Projects() {
           const isExpanded = expandedProject === project.project_id;
 
           return (
-            <Card key={project.project_id} className="hover:shadow-md transition-shadow">
+            <Card key={project.project_id} className="border-0 shadow-sm hover:shadow-lg transition-all duration-300 cursor-pointer" onClick={() => navigate(`/projects/${project.project_id}`)}>
               <CardHeader className="pb-3">
                 <div className="flex items-start justify-between">
                   <div className="flex-1">
                     <div className="flex items-center gap-3">
-                      <CardTitle className="text-lg">{project.project_name}</CardTitle>
+                      <CardTitle className="text-lg">{project.project_name || project.client_name}</CardTitle>
                       <Badge className={statusColors[project.status] || "bg-zinc-100 text-zinc-700"}>
                         {project.status}
                       </Badge>
@@ -172,13 +174,13 @@ export default function Projects() {
                       {project.client_name} &bull; {project.project_type}
                     </p>
                   </div>
-                  <Button variant="ghost" size="icon" onClick={() => toggleExpand(project.project_id)}>
+                  <Button variant="ghost" size="icon" onClick={(e) => { e.stopPropagation(); toggleExpand(project.project_id); }}>
                     {isExpanded ? <ChevronUp className="h-4 w-4" /> : <ChevronDown className="h-4 w-4" />}
                   </Button>
                 </div>
               </CardHeader>
               <CardContent>
-                <div className="flex flex-wrap gap-4 text-sm text-zinc-600">
+                <div className="flex flex-wrap gap-4 text-sm text-slate-600">
                   {project.property_address && (
                     <div className="flex items-center gap-1">
                       <MapPin className="h-3.5 w-3.5" /> {project.property_address}
@@ -209,22 +211,22 @@ export default function Projects() {
                     </div>
                     {/* Progress bar */}
                     {projectTasks.length > 0 && (
-                      <div className="w-full bg-zinc-100 rounded-full h-2 mb-3">
+                      <div className="w-full bg-stone-100 rounded-full h-2.5 mb-3">
                         <div
-                          className="bg-sky-500 h-2 rounded-full transition-all"
+                          className="bg-gradient-to-r from-sky-500 to-cyan-400 h-2.5 rounded-full transition-all"
                           style={{ width: `${(completedTasks / projectTasks.length) * 100}%` }}
                         />
                       </div>
                     )}
-                    <div className="space-y-2">
+                    <div className="space-y-2" onClick={(e) => e.stopPropagation()}>
                       {projectTasks.map((task) => (
                         <button
                           key={task.task_id}
                           onClick={() => handleTaskToggle(project.project_id, task.task_id, task.status)}
-                          className="flex items-center gap-2 w-full text-left text-sm hover:bg-zinc-50 rounded p-1"
+                          className="flex items-center gap-2 w-full text-left text-sm hover:bg-stone-50 rounded-lg p-1.5 transition-colors"
                         >
                           {task.status === "completed" ? (
-                            <CheckCircle2 className="h-4 w-4 text-sky-500 flex-shrink-0" />
+                            <CheckCircle2 className="h-4 w-4 text-emerald-500 flex-shrink-0" />
                           ) : (
                             <Circle className="h-4 w-4 text-zinc-300 flex-shrink-0" />
                           )}
@@ -238,7 +240,7 @@ export default function Projects() {
                 )}
 
                 {/* Actions */}
-                <div className="flex items-center gap-2 mt-4 pt-3 border-t">
+                <div className="flex items-center gap-2 mt-4 pt-3 border-t" onClick={(e) => e.stopPropagation()}>
                   <Select
                     value={project.status}
                     onChange={(e) => handleStatusChange(project.project_id, e.target.value)}
@@ -259,9 +261,12 @@ export default function Projects() {
       </div>
 
       {projects.length === 0 && (
-        <div className="text-center py-12 text-zinc-400">
-          <FolderKanban className="h-12 w-12 mx-auto mb-4 opacity-50" />
-          <p>No projects yet. Convert leads or create a new project!</p>
+        <div className="text-center py-16 text-slate-400">
+          <div className="mx-auto mb-4 flex h-16 w-16 items-center justify-center rounded-2xl bg-slate-100">
+            <FolderKanban className="h-8 w-8 text-slate-400" />
+          </div>
+          <p className="text-lg font-medium text-slate-500">No projects yet</p>
+          <p className="text-sm mt-1">Convert leads or create a new project!</p>
         </div>
       )}
 

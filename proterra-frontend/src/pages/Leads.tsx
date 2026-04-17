@@ -1,4 +1,5 @@
 import { useEffect, useState } from "react";
+import { useNavigate } from "react-router-dom";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
@@ -33,16 +34,17 @@ const SOURCES = ["website", "facebook", "instagram", "referral", "google", "othe
 const PROJECT_TYPES = ["Pool", "Outdoor Kitchen", "Patio/Deck", "Landscaping", "Full Backyard", "Fire Feature", "Pergola/Pavilion", "Other"];
 
 const statusColors: Record<string, string> = {
-  "New Lead": "bg-blue-100 text-blue-700",
-  Contacted: "bg-yellow-100 text-yellow-700",
-  "Site Visit Scheduled": "bg-purple-100 text-purple-700",
-  "Proposal Sent": "bg-orange-100 text-orange-700",
-  Qualified: "bg-sky-100 text-sky-700",
-  Converted: "bg-green-100 text-green-700",
-  Lost: "bg-red-100 text-red-700",
+  "New Lead": "bg-blue-100 text-blue-700 ring-1 ring-blue-200",
+  Contacted: "bg-amber-50 text-amber-700 ring-1 ring-amber-200",
+  "Site Visit Scheduled": "bg-violet-100 text-violet-700 ring-1 ring-violet-200",
+  "Proposal Sent": "bg-orange-100 text-orange-700 ring-1 ring-orange-200",
+  Qualified: "bg-sky-100 text-sky-700 ring-1 ring-sky-200",
+  Converted: "bg-emerald-100 text-emerald-700 ring-1 ring-emerald-200",
+  Lost: "bg-red-100 text-red-700 ring-1 ring-red-200",
 };
 
 export default function Leads() {
+  const navigate = useNavigate();
   const [leads, setLeads] = useState<Lead[]>([]);
   const [loading, setLoading] = useState(true);
   const [dialogOpen, setDialogOpen] = useState(false);
@@ -93,7 +95,7 @@ export default function Leads() {
   if (loading)
     return (
       <div className="flex items-center justify-center h-64">
-        <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-sky-600" />
+        <div className="animate-spin rounded-full h-10 w-10 border-2 border-sky-200 border-t-sky-600" />
       </div>
     );
 
@@ -101,8 +103,8 @@ export default function Leads() {
     <div className="space-y-6">
       <div className="flex items-center justify-between">
         <div>
-          <h1 className="text-3xl font-bold">Lead Pipeline</h1>
-          <p className="text-zinc-500 mt-1">{leads.length} leads total</p>
+          <h1 className="text-3xl font-bold text-slate-900">Lead Pipeline</h1>
+          <p className="text-slate-500 mt-1">{leads.length} leads total</p>
         </div>
         <Button onClick={() => setDialogOpen(true)}>
           <Plus className="mr-2 h-4 w-4" /> New Lead
@@ -133,7 +135,7 @@ export default function Leads() {
       {/* Kanban-style columns */}
       <div className="grid grid-cols-1 gap-4 xl:grid-cols-3 2xl:grid-cols-4">
         {leads.map((lead) => (
-          <Card key={lead.lead_id} className="hover:shadow-md transition-shadow">
+          <Card key={lead.lead_id} className="border-0 shadow-sm hover:shadow-lg transition-all duration-300 hover:-translate-y-0.5 cursor-pointer" onClick={() => navigate(`/leads/${lead.lead_id}`)}>
             <CardHeader className="pb-3">
               <div className="flex items-start justify-between">
                 <CardTitle className="text-base">{lead.full_name}</CardTitle>
@@ -141,34 +143,34 @@ export default function Leads() {
                   {lead.status}
                 </Badge>
               </div>
-              <p className="text-xs text-zinc-400">
+              <p className="text-xs text-slate-400">
                 {lead.project_type} &bull; {new Date(lead.created_at).toLocaleDateString()}
               </p>
             </CardHeader>
             <CardContent className="space-y-2">
               {lead.email && (
                 <div className="flex items-center gap-2 text-sm text-zinc-600">
-                  <Mail className="h-3.5 w-3.5" /> {lead.email}
+                  <Mail className="h-3.5 w-3.5 text-slate-400" /> {lead.email}
                 </div>
               )}
               {lead.phone && (
-                <div className="flex items-center gap-2 text-sm text-zinc-600">
-                  <Phone className="h-3.5 w-3.5" /> {lead.phone}
+                <div className="flex items-center gap-2 text-sm text-slate-600">
+                  <Phone className="h-3.5 w-3.5 text-slate-400" /> {lead.phone}
                 </div>
               )}
               {lead.property_address && (
-                <div className="flex items-center gap-2 text-sm text-zinc-600">
-                  <MapPin className="h-3.5 w-3.5" /> {lead.property_address}
+                <div className="flex items-center gap-2 text-sm text-slate-600">
+                  <MapPin className="h-3.5 w-3.5 text-slate-400" /> {lead.property_address}
                 </div>
               )}
               {lead.budget_range && (
-                <p className="text-sm text-zinc-500">Budget: {lead.budget_range}</p>
+                <p className="text-sm font-medium text-slate-600">Budget: {lead.budget_range}</p>
               )}
               {lead.notes && (
-                <p className="text-sm text-zinc-400 truncate">{lead.notes}</p>
+                <p className="text-sm text-slate-400 truncate">{lead.notes}</p>
               )}
 
-              <div className="flex items-center gap-2 pt-2 border-t">
+              <div className="flex items-center gap-2 pt-2 border-t" onClick={(e) => e.stopPropagation()}>
                 <Select
                   value={lead.status}
                   onChange={(e) => handleStatusChange(lead.lead_id, e.target.value)}
@@ -193,9 +195,12 @@ export default function Leads() {
       </div>
 
       {leads.length === 0 && (
-        <div className="text-center py-12 text-zinc-400">
-          <Users className="h-12 w-12 mx-auto mb-4 opacity-50" />
-          <p>No leads found. Create one or check your lead forms!</p>
+        <div className="text-center py-16 text-slate-400">
+          <div className="mx-auto mb-4 flex h-16 w-16 items-center justify-center rounded-2xl bg-slate-100">
+            <Users className="h-8 w-8 text-slate-400" />
+          </div>
+          <p className="text-lg font-medium text-slate-500">No leads found</p>
+          <p className="text-sm mt-1">Create one or check your lead forms!</p>
         </div>
       )}
 

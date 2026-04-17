@@ -141,23 +141,23 @@ export default function Bidding() {
   if (loading)
     return (
       <div className="flex items-center justify-center h-64">
-        <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-sky-600" />
+        <div className="animate-spin rounded-full h-10 w-10 border-2 border-sky-200 border-t-sky-600" />
       </div>
     );
 
   const statusColors: Record<string, string> = {
-    draft: "bg-zinc-100 text-zinc-700",
-    open: "bg-blue-100 text-blue-700",
-    closed: "bg-yellow-100 text-yellow-700",
-    awarded: "bg-green-100 text-green-700",
+    draft: "bg-slate-100 text-slate-700 ring-1 ring-slate-200",
+    open: "bg-blue-100 text-blue-700 ring-1 ring-blue-200",
+    closed: "bg-amber-100 text-amber-700 ring-1 ring-amber-200",
+    awarded: "bg-emerald-100 text-emerald-700 ring-1 ring-emerald-200",
   };
 
   return (
     <div className="space-y-6">
       <div className="flex items-center justify-between">
         <div>
-          <h1 className="text-3xl font-bold">Controlled Bidding</h1>
-          <p className="text-zinc-500 mt-1">Apples-to-apples contractor bidding from finalized designs</p>
+          <h1 className="text-3xl font-bold text-slate-900">Controlled Bidding</h1>
+          <p className="text-slate-500 mt-1">Apples-to-apples contractor bidding from finalized designs</p>
         </div>
         <div className="flex gap-2">
           <Button variant="outline" onClick={() => {
@@ -183,7 +183,7 @@ export default function Bidding() {
             {packages.map((pkg) => {
               const project = projects.find((p) => p.project_id === pkg.project_id);
               return (
-                <Card key={pkg.package_id} className="hover:shadow-md transition-shadow">
+                <Card key={pkg.package_id} className="border-0 shadow-sm hover:shadow-lg transition-all duration-300">
                   <CardHeader className="pb-3">
                     <div className="flex items-start justify-between">
                       <CardTitle className="text-base">{pkg.title}</CardTitle>
@@ -192,15 +192,15 @@ export default function Bidding() {
                       </Badge>
                     </div>
                     {project && (
-                      <p className="text-xs text-zinc-400">Project: {project.project_name}</p>
+                      <p className="text-xs text-slate-400">Project: {project.project_name}</p>
                     )}
                   </CardHeader>
                   <CardContent className="space-y-3">
                     {pkg.description && (
-                      <p className="text-sm text-zinc-600">{pkg.description}</p>
+                      <p className="text-sm text-slate-600">{pkg.description}</p>
                     )}
                     {pkg.deadline && (
-                      <div className="flex items-center gap-2 text-sm text-zinc-500">
+                      <div className="flex items-center gap-2 text-sm text-slate-500">
                         <Calendar className="h-3.5 w-3.5" />
                         Deadline: {new Date(pkg.deadline).toLocaleDateString()}
                       </div>
@@ -232,16 +232,19 @@ export default function Bidding() {
           </div>
 
           {packages.length === 0 && (
-            <div className="text-center py-12 text-zinc-400">
-              <Gavel className="h-12 w-12 mx-auto mb-4 opacity-50" />
-              <p>No bid packages yet. Create one to start the bidding process!</p>
+            <div className="text-center py-16 text-slate-400">
+              <div className="mx-auto mb-4 flex h-16 w-16 items-center justify-center rounded-2xl bg-slate-100">
+                <Gavel className="h-8 w-8 text-slate-400" />
+              </div>
+              <p className="text-lg font-medium text-slate-500">No bid packages yet</p>
+              <p className="text-sm mt-1">Create one to start the bidding process!</p>
             </div>
           )}
         </TabsContent>
 
         <TabsContent value="compare">
           <div className="space-y-4">
-            <p className="text-sm text-zinc-500">Select a bid package to compare bids side-by-side:</p>
+            <p className="text-sm text-slate-500">Select a bid package to compare bids side-by-side:</p>
             <div className="grid grid-cols-1 gap-3 md:grid-cols-2 lg:grid-cols-3">
               {packages.map((pkg) => (
                 <Button
@@ -251,7 +254,7 @@ export default function Bidding() {
                   onClick={() => handleCompare(pkg.package_id)}
                 >
                   <span className="font-medium">{pkg.title}</span>
-                  <span className="text-xs text-zinc-400">{pkg.status}</span>
+                  <span className="text-xs text-slate-400">{pkg.status}</span>
                 </Button>
               ))}
             </div>
@@ -378,19 +381,19 @@ export default function Bidding() {
           <div className="space-y-4">
             {/* Summary */}
             <div className="grid grid-cols-4 gap-3">
-              <div className="rounded-lg bg-zinc-50 p-3 text-center">
-                <p className="text-xs text-zinc-400">Bids</p>
+              <div className="rounded-xl bg-slate-50 p-3 text-center ring-1 ring-slate-100">
+                <p className="text-xs text-slate-500">Bids</p>
                 <p className="text-lg font-bold">{comparison.summary.total_bids}</p>
               </div>
-              <div className="rounded-lg bg-green-50 p-3 text-center">
+              <div className="rounded-xl bg-green-50 p-3 text-center ring-1 ring-green-100">
                 <p className="text-xs text-green-600">Lowest</p>
                 <p className="text-lg font-bold text-green-700">${comparison.summary.lowest_price.toLocaleString()}</p>
               </div>
-              <div className="rounded-lg bg-red-50 p-3 text-center">
+              <div className="rounded-xl bg-red-50 p-3 text-center ring-1 ring-red-100">
                 <p className="text-xs text-red-600">Highest</p>
                 <p className="text-lg font-bold text-red-700">${comparison.summary.highest_price.toLocaleString()}</p>
               </div>
-              <div className="rounded-lg bg-blue-50 p-3 text-center">
+              <div className="rounded-xl bg-blue-50 p-3 text-center ring-1 ring-blue-100">
                 <p className="text-xs text-blue-600">Average</p>
                 <p className="text-lg font-bold text-blue-700">${comparison.summary.average_price.toLocaleString()}</p>
               </div>

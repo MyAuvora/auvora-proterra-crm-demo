@@ -90,6 +90,80 @@ export const askAI = (question: string, context?: string) =>
   });
 export const getAISuggestions = () => request("/api/ai/suggestions");
 
+// Automations
+export const getAutomations = () => request("/api/automations");
+export const getAutomation = (id: string) => request(`/api/automations/${id}`);
+export const createAutomation = (data: Record<string, unknown>) =>
+  request("/api/automations", { method: "POST", body: JSON.stringify(data) });
+export const updateAutomation = (id: string, data: Record<string, unknown>) =>
+  request(`/api/automations/${id}`, { method: "PUT", body: JSON.stringify(data) });
+export const deleteAutomation = (id: string) =>
+  request(`/api/automations/${id}`, { method: "DELETE" });
+export const toggleAutomation = (id: string) =>
+  request(`/api/automations/${id}/toggle`, { method: "POST" });
+export const getAutomationLogs = (id: string) =>
+  request(`/api/automations/${id}/logs`);
+export const aiCreateAutomation = (prompt: string) =>
+  request("/api/automations/ai/create", { method: "POST", body: JSON.stringify({ prompt }) });
+export const getAutomationSuggestions = () =>
+  request("/api/automations/ai/suggestions");
+
 // Webhooks (for testing)
 export const submitLeadForm = (data: Record<string, unknown>) =>
   request("/api/webhooks/lead", { method: "POST", body: JSON.stringify(data) });
+
+// Client Portal
+export const getPortalAccess = () => request("/api/client-portal/access");
+export const createPortalAccess = (data: Record<string, unknown>) =>
+  request("/api/client-portal/access", { method: "POST", body: JSON.stringify(data) });
+export const deletePortalAccess = (id: string) =>
+  request(`/api/client-portal/access/${id}`, { method: "DELETE" });
+export const togglePortalAccess = (id: string) =>
+  request(`/api/client-portal/access/${id}/toggle`, { method: "POST" });
+export const getDesignApprovals = () => request("/api/client-portal/approvals");
+export const createDesignApproval = (data: Record<string, unknown>) =>
+  request("/api/client-portal/approvals", { method: "POST", body: JSON.stringify(data) });
+
+// Invoicing & Payments
+export const getInvoices = (status?: string) =>
+  request(`/api/invoicing/invoices${status ? `?status=${status}` : ""}`);
+export const getInvoice = (id: string) => request(`/api/invoicing/invoices/${id}`);
+export const createInvoice = (data: Record<string, unknown>) =>
+  request("/api/invoicing/invoices", { method: "POST", body: JSON.stringify(data) });
+export const updateInvoice = (id: string, data: Record<string, unknown>) =>
+  request(`/api/invoicing/invoices/${id}`, { method: "PUT", body: JSON.stringify(data) });
+export const deleteInvoice = (id: string) =>
+  request(`/api/invoicing/invoices/${id}`, { method: "DELETE" });
+export const recordPayment = (data: Record<string, unknown>) =>
+  request("/api/invoicing/payments", { method: "POST", body: JSON.stringify(data) });
+export const getPaymentSchedules = (projectId?: string) =>
+  request(`/api/invoicing/schedules${projectId ? `?project_id=${projectId}` : ""}`);
+export const createPaymentSchedule = (data: Record<string, unknown>) =>
+  request("/api/invoicing/schedules", { method: "POST", body: JSON.stringify(data) });
+export const getInvoiceSummary = () => request("/api/invoicing/summary");
+
+// Documents
+export const getDocuments = (entityType: string, entityId: string, category?: string) =>
+  request(`/api/documents?entity_type=${entityType}&entity_id=${entityId}${category ? `&category=${category}` : ""}`);
+export const uploadDocument = async (file: File, entityType: string, entityId: string, category: string, description: string) => {
+  const formData = new FormData();
+  formData.append("file", file);
+  formData.append("entity_type", entityType);
+  formData.append("entity_id", entityId);
+  formData.append("category", category);
+  formData.append("description", description);
+  const res = await fetch(`${API_URL}/api/documents`, { method: "POST", body: formData });
+  if (!res.ok) { const text = await res.text(); throw new Error(`API error ${res.status}: ${text}`); }
+  return res.json();
+};
+export const deleteDocument = (id: string) =>
+  request(`/api/documents/${id}`, { method: "DELETE" });
+export const getDocumentDownloadUrl = (id: string) =>
+  `${API_URL}/api/documents/${id}/download`;
+
+// Reports
+export const getRevenuePipeline = () => request("/api/reports/revenue-pipeline");
+export const getLeadConversion = () => request("/api/reports/lead-conversion");
+export const getContractorScorecards = () => request("/api/reports/contractor-scorecards");
+export const getProfitTracking = () => request("/api/reports/profit-tracking");
+export const getMonthlySummary = () => request("/api/reports/monthly-summary");
