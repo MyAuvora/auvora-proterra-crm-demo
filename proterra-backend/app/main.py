@@ -67,6 +67,8 @@ def reseed_database(
     if os.path.isdir(UPLOAD_DIR):
         shutil.rmtree(UPLOAD_DIR)
         os.makedirs(UPLOAD_DIR, exist_ok=True)
+    db.query(models.AutomationLog).delete()
+    db.query(models.Automation).delete()
     db.query(models.ActivityLog).delete()
     db.query(models.Payment).delete()
     db.query(models.InvoiceLineItem).delete()

@@ -419,7 +419,7 @@ def invoicing_summary(db: Session = Depends(get_db)):
         by_status[inv.status] = by_status.get(inv.status, 0) + 1
 
     overdue_count = sum(
-        1 for i in invoices
+        i.total for i in invoices
         if i.status in ("Sent", "Draft") and i.due_date and i.due_date < date.today()
     )
 
